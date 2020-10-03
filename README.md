@@ -2,7 +2,13 @@
 
 
 ## Overview
-Elbrus is a SPARC-inspired VLIW architecture.
+
+Elbrus 2000 (Elbrus or e2k for short), is a SPARC-inspired VLIW architecture
+developed by the [Moscow Center for SPARC Technology (MCST)](http://mcst.ru/).
+
+Elbrus machine code is organized into [very long instruction words (VLIW)](https://en.wikipedia.org/wiki/Very_long_instruction_word),
+which consist of multiple so-called syllables that are executed together.
+
 
 ## Structure
 
@@ -61,9 +67,12 @@ TODO: 32 two-bit predicates.
 
 #### Chain file, CF 
 
-#### Other
+#### Special purpose registers
 
-CUIR - compilation unit index register, индекс дескрипторов модуля компиляции
+ Name   | Description
+--------|--------------------------------------------------------------
+ CUIR   | compilation unit index register, индекс дескрипторов модуля компиляции
+
 
 ## Instructions
 
@@ -86,90 +95,104 @@ CDS  | Conditional syllable - specified which operations are to be executed unde
 The first syllable is the header syllable.
 Presence of other syllables depend on the purpose of the command.
 Syllables occur in the following order:
-HS, SS, ALS0, ALS1, ALS2, ALS3, ALS4, ALS5, CS0, CS1, ALES2, ALES5, ALES0, ALES1, ALES3, ALES4, AAS0, AAS1, AAS2, AAS3, AAS4, AAS5, LTS3, LTS2, LTS1, LTS0, PLS2, PLS1, PLS0, CDS2, CDS1, CDS0.
 
-#### Header syllable
+- HS
+- SS
+- ALS0, ALS1, ALS2, ALS3, ALS4, ALS5
+- CS0, CS1
+- ALES2, ALES5, ALES0, ALES1, ALES3, ALES4
+- AAS0, AAS1, AAS2, AAS3, AAS4, AAS5
+- LTS3, LTS2, LTS1, LTS0
+- PLS2, PLS1, PLS0
+- CDS2, CDS1, CDS0
 
-Bit | Description
---- | ---
-0 - 3   | Number of syllables occupied by SS, ALS, CS, ALES2, ALES5 - called "middle pointer"
-4 - 6   | Length of instruction, in multiples of 8 bytes, minus 8 bytes
-7 - 9   | nop
-10      | loop_mode
-11      | ?
-12      | SS
-13      | set_mark
-14      | CS0
-15      | CS1
-16 - 17 | CDS
-18 - 19 | PLS
-20      | ALES0
-21      | ALES1
-22      | ALES2
-23      | ALES3
-24      | ALES4
-25      | ALES5
-26      | ALS0
-27      | ALS1
-28      | ALS2
-29      | ALS3
-30      | ALS4
-31      | ALS5
 
-#### Stubs syllable
+#### HS - Header syllable
 
-Bit | Description
---- | ---
-0 - 8  | ctcond (?)
-9  | ?
-10 - 11 | ctpr (?)
-12 - 15 | syllable scale - see below
-16 | alct
-17 | alcf
-18 | abpt
-19 | abpf
-20 | ?
-21 | abnt
-22 | abnf
-23 | abgd
-24 | abgi
-25 | crp (?)
-26 | vfdi
-27 | srp
-28 | bap - begin array prefetch
-29 | eap - end array prefetch
-30 - 31 | ipd - instruction prefetch depth
+Bit     | Name          | Description
+------- | ------------- | -----------------------------------------------------
+0 - 3   |               | Number of syllables occupied by SS, ALS, CS, ALES2, ALES5 - called "middle pointer"
+4 - 6   |               | Length of instruction, in multiples of 8 bytes, minus 8 bytes
+7 - 9   | nop           |
+10      | loop_mode     |
+11      | --            | unused
+12      | SS            | stub syllable presence
+13      | set_mark      |
+14      | CS0           | control syllable 0 presence
+15      | CS1           | control syllable 1 presence
+16 - 17 | CDS           | conditional execution mode
+18 - 19 | PLS           | predicate logic presence
+20      | ALES0         | arithmetic-logic extension syllable 0 presence
+21      | ALES1         | arithmetic-logic extension syllable 1 presence
+22      | ALES2         | arithmetic-logic extension syllable 2 presence
+23      | ALES3         | arithmetic-logic extension syllable 3 presence
+24      | ALES4         | arithmetic-logic extension syllable 4 presence
+25      | ALES5         | arithmetic-logic extension syllable 5 presence
+26      | ALS0          | arithmetic-logic syllable 0 presence
+27      | ALS1          | arithmetic-logic syllable 1 presence
+28      | ALS2          | arithmetic-logic syllable 2 presence
+29      | ALS3          | arithmetic-logic syllable 3 presence
+30      | ALS4          | arithmetic-logic syllable 4 presence
+31      | ALS5          | arithmetic-logic syllable 5 presence
 
-#### ALS
+#### SS - Stubs syllable
 
-Bit | Description
---- | ---
-0 - 24 | Params
-24 - 30   | Opcode
-31   | Speculative mode
+Bit     | Name          | Description
+------- | ------------- | ---------------------------------------------
+0 - 8   | ctcond (?)    |
+9       | ?             |
+10 - 11 | ctpr (?)      |
+12 - 15 |               | syllable scale - see below
+16      | alct          |
+17      | alcf          |
+18      | abpt          |
+19      | abpf          |
+20      | ?             |
+21      | abnt          |
+22      | abnf          |
+23      | abgd          |
+24      | abgi          |
+25      | crp (?)       |
+26      | vfdi          |
+27      | srp           |
+28      | bap           | begin array prefetch
+29      | eap           | end array prefetch
+30 - 31 | ipd           | instruction prefetch depth
 
-#### ALES
+#### ALS - Arithmetic-logical syllables
 
-Bit | Description
---- | ---
-0 - 7 | Extension
-8 - 15 | Opcode 2
+Bit     | Description
+------- | -------------------------------------------------------------
+0 - 7   | Operand
+8 - 15  | Operand
+16 - 23 | Operand
+24 - 30 | Opcode
+31      | Speculative mode
 
-### Address operands
+#### ALES - Arithmetic-logical extension syllables
 
-0xxx xxxx - Rotatable area procedure stack register
-10xx xxxx - procedure stack register
-111x xxxx - global register
-1111 1xxx - Rotatable area global register
-1100 xxxx - literal
+Bit     | Description
+------- | -------------------------------------------------------------
+0 - 7   | Extension
+8 - 15  | Opcode 2
 
-Not in src2:
-1101 xxxx - literal between 16 and 31
+### Operands
 
-Only in src2:
-1101 0xxx - reference to 16 bit constant semi-syllable; (1<<2) indicates high half of a LTS
-1101 10xx - reference to 32 bit constant syllable LTS0, LTS1, LTS2, or LTS3
-1101 11xx - reference to 64 bit constant syllable pair (LTS0 and LTS1, LTS1 and LTS2, LTS2 and LTS3)
+Operands to arithmetic-logical operations can encode different kinds of
+registers and literals.
+
+Pattern   | Range | Applicability | Description
+----------|-------|---------------|------------------------------------
+0xxx xxxx | 00-7f |               | Rotatable area procedure stack register
+10xx xxxx | 80-bf |               | procedure stack register
+1100 xxxx | c0-cf |               | literal between 0 and 15
+1101 xxxx | d0-df | not in src2   | literal between 16 and 31
+1101 0xxx | d0-d7 | only in src2  | reference to 16 bit constant semi-syllable; (1<<2) indicates high half of a LTS
+1101 10xx | d8-db | only in src2  | reference to 32 bit constant syllable LTS0, LTS1, LTS2, or LTS3
+1101 11xx | dc-df | only in src2  | reference to 64 bit constant syllable pair (LTS0 and LTS1, LTS1 and LTS2, LTS2 and LTS3)
+111x xxxx | e0-ff |               | global register
+1111 1xxx | f8-ff |               | Rotatable area global register
+
 
 ## Decoding
 
