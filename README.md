@@ -120,8 +120,8 @@ Bit     | Name          | Description
 13      | set_mark      |
 14      | CS0           | control syllable 0 presence
 15      | CS1           | control syllable 1 presence
-16 - 17 | CDS           | conditional execution mode
-18 - 19 | PLS           | predicate logic presence
+16 - 17 | CDS           | number of conditional execution syllables
+18 - 19 | PLS           | number of predicate logic syllables
 20      | ALES0         | arithmetic-logic extension syllable 0 presence
 21      | ALES1         | arithmetic-logic extension syllable 1 presence
 22      | ALES2         | arithmetic-logic extension syllable 2 presence
