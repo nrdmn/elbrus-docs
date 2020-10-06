@@ -111,70 +111,70 @@ Syllables occur in the following order:
 
 Bit     | Name          | Description
 ------- | ------------- | -----------------------------------------------------
-0 - 3   |               | Number of syllables occupied by SS, ALS, CS, ALES2, ALES5 - called "middle pointer"
-4 - 6   |               | Length of instruction, in multiples of 8 bytes, minus 8 bytes
-7 - 9   | nop           |
-10      | loop_mode     |
-11      | --            | unused
-12      | SS            | stub syllable presence
-13      | set_mark      |
-14      | CS0           | control syllable 0 presence
-15      | CS1           | control syllable 1 presence
-16 - 17 | CDS           | number of conditional execution syllables
-18 - 19 | PLS           | number of predicate logic syllables
-20      | ALES0         | arithmetic-logic extension syllable 0 presence
-21      | ALES1         | arithmetic-logic extension syllable 1 presence
-22      | ALES2         | arithmetic-logic extension syllable 2 presence
-23      | ALES3         | arithmetic-logic extension syllable 3 presence
-24      | ALES4         | arithmetic-logic extension syllable 4 presence
-25      | ALES5         | arithmetic-logic extension syllable 5 presence
-26      | ALS0          | arithmetic-logic syllable 0 presence
-27      | ALS1          | arithmetic-logic syllable 1 presence
-28      | ALS2          | arithmetic-logic syllable 2 presence
-29      | ALS3          | arithmetic-logic syllable 3 presence
-30      | ALS4          | arithmetic-logic syllable 4 presence
-31      | ALS5          | arithmetic-logic syllable 5 presence
+   31   | ALS5          | arithmetic-logic syllable 5 presence
+   30   | ALS4          | arithmetic-logic syllable 4 presence
+   29   | ALS3          | arithmetic-logic syllable 3 presence
+   28   | ALS2          | arithmetic-logic syllable 2 presence
+   27   | ALS1          | arithmetic-logic syllable 1 presence
+   26   | ALS0          | arithmetic-logic syllable 0 presence
+   25   | ALES5         | arithmetic-logic extension syllable 5 presence
+   24   | ALES4         | arithmetic-logic extension syllable 4 presence
+   23   | ALES3         | arithmetic-logic extension syllable 3 presence
+   22   | ALES2         | arithmetic-logic extension syllable 2 presence
+   21   | ALES1         | arithmetic-logic extension syllable 1 presence
+   20   | ALES0         | arithmetic-logic extension syllable 0 presence
+ 19:18  | PLS           | number of predicate logic syllables
+ 17:16  | CDS           | number of conditional execution syllables
+   15   | CS1           | control syllable 1 presence
+   14   | CS0           | control syllable 0 presence
+   13   | set_mark      |
+   12   | SS            | stub syllable presence
+   11   | --            | unused
+   10   | loop_mode     |
+   9:7  | nop           |
+   6:4  |               | Length of instruction, in multiples of 8 bytes, minus 8 bytes
+   3:0  |               | Number of syllables occupied by SS, ALS, CS, ALES2, ALES5 - called "middle pointer"
 
 #### SS - Stubs syllable
 
 Bit     | Name          | Description
 ------- | ------------- | ---------------------------------------------
-0 - 8   | ctcond (?)    |
-9       | ?             |
-10 - 11 | ctpr (?)      |
-12 - 15 |               | syllable scale - see below
-16      | alct          |
-17      | alcf          |
-18      | abpt          |
-19      | abpf          |
-20      | ?             |
-21      | abnt          |
-22      | abnf          |
-23      | abgd          |
-24      | abgi          |
-25      | crp (?)       |
-26      | vfdi          |
-27      | srp           |
-28      | bap           | begin array prefetch
-29      | eap           | end array prefetch
-30 - 31 | ipd           | instruction prefetch depth
+ 31:30  | ipd           | instruction prefetch depth
+   29   | eap           | end array prefetch
+   28   | bap           | begin array prefetch
+   27   | srp           |
+   26   | vfdi          |
+   25   | crp (?)       |
+   24   | abgi          |
+   23   | abgd          |
+   22   | abnf          |
+   21   | abnt          |
+   20   | ?             |
+   19   | abpf          |
+   18   | abpt          |
+   17   | alcf          |
+   16   | alct          |
+ 15:12  |               | syllable scale - see below
+ 11:10  | ctpr (?)      |
+    9   | ?             |
+   8:0  | ctcond (?)    |
 
 #### ALS - Arithmetic-logical syllables
 
 Bit     | Description
 ------- | -------------------------------------------------------------
-0 - 7   | Operand
-8 - 15  | Operand
-16 - 23 | Operand
-24 - 30 | Opcode
-31      | Speculative mode
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | Source operand
+ 15:8   | Source operand
+  7:0   | Destination operand
 
 #### ALES - Arithmetic-logical extension syllables
 
 Bit     | Description
 ------- | -------------------------------------------------------------
-0 - 7   | Extension
-8 - 15  | Opcode 2
+  15:8  | Opcode 2
+   7:0  | Extension
 
 ### Operands
 
