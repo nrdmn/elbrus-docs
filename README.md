@@ -9,6 +9,14 @@ developed by the [Moscow Center for SPARC Technology (MCST)](http://mcst.ru/).
 Elbrus machine code is organized into [very long instruction words (VLIW)](https://en.wikipedia.org/wiki/Very_long_instruction_word),
 which consist of multiple so-called syllables that are executed together.
 
+### References
+
+Several useful documents about Elbrus are available on the internet, albeit
+mostly in Russian.
+
+- [Руководство по эффективному программированию на платформе «Эльбрус» (elbrus-prog)](http://ftp.altlinux.org/pub/people/mike/elbrus/docs/elbrus_prog/html/)
+- [Микропроцессоры и вычислительные комплексы семейства «Эльбрус»](http://www.mcst.ru/doc/book_121130.pdf)
+
 
 ## Structure
 
