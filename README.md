@@ -164,7 +164,7 @@ Bit     | Name          | Description
    16   | alct          |
  15:12  |               | syllable scale - see below
  11:10  | ctpr (?)      |
-    9   | ?             |
+   9    | ?             |
    8:0  | ctcond (?)    |
 
 #### ALS - Arithmetic-logical syllables
