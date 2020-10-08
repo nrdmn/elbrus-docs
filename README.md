@@ -176,6 +176,52 @@ Bit     | Description
   15:8  | Opcode 2
    7:0  | Extension
 
+#### CS - Control syllables
+
+CS0 and CS1 encode different operations.
+
+ Syllable | pattern  | name   | description
+----------|----------|--------|----------------------------------------
+  CS0     | 0xxxxxxx | set\*  | setwd/setbn/setbp/settr
+  CS0     | 300000xx | wait   | wait for specified kinds of operations to complete
+
+
+
+##### set\*
+
+The set\* operation sets several parameters related to register windows.
+Most bits are encoded in the CS0 syllable itself, but some are also read from
+the LTS0 syllable.
+
+According to `ldis`, setwd is always performed, but settr, setbn, and setbp
+have to be enabled by setting the corrsponding bits in CS0.
+
+ Syl. | bit    | name        | description
+------|--------|-------------|-----------------------------------------
+ CS0  |     27 |enable settr |
+ CS0  |     26 |enable setbn |
+ CS0  |     25 |enable setbp |
+ CS0  |  22:18 | setbp psz=x |
+ CS0  |  17:12 | setbn rcur=x|
+ CS0  |  11:6  | setbn rsz=x |
+ CS0  |   5:0  | setbn rbs=x |
+ LTS0 |     4  | setwd nfx=x |
+ LTS0 |  11:5  | setwd wsz=x |
+
+
+##### wait
+
+ Bit    | name  | description
+--------|-------|------------------------------------------------------
+  5     |`ma_c` | wait for all previous memory access operations to complete
+  4     |`fl_c` | wait for all previous cache flush operations to complete
+  3     |`ls_c` | wait for all previous load operations to complete
+  2     |`st_c` | wait for all previous store operations to complete
+  1     |`all_e`| wait for all previous operations to issue all possible exceptions
+  0     |`all_c`| wait for all previous operations to complete
+
+
+
 ### Operands
 
 Operands to arithmetic-logical operations can encode different kinds of
