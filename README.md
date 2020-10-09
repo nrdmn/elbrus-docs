@@ -145,27 +145,49 @@ Bit     | Name          | Description
 
 #### SS - Stubs syllable
 
-Bit     | Name          | Description
-------- | ------------- | ---------------------------------------------
- 31:30  | ipd           | instruction prefetch depth
-   29   | eap           | end array prefetch
-   28   | bap           | begin array prefetch
-   27   | srp           |
-   26   | vfdi          |
-   25   | crp (?)       |
-   24   | abgi          |
-   23   | abgd          |
-   22   | abnf          |
-   21   | abnt          |
-   20   | ?             |
-   19   | abpf          |
-   18   | abpt          |
-   17   | alcf          |
-   16   | alct          |
- 15:12  |               | syllable scale - see below
- 11:10  | ctpr (?)      |
-   9    | ?             |
-   8:0  | ctcond (?)    |
+Bit     | Name     | Description
+--------|----------|----------------------------------------------
+ 31:30  | ipd      | instruction prefetch depth
+   29   | eap      | end array prefetch
+   28   | bap      | begin array prefetch
+   27   | srp      |
+   26   | vfdi     |
+   25   | crp (?)  |
+   24   | abgi     |
+   23   | abgd     |
+   22   | abnf     |
+   21   | abnt     |
+   20   | ?        |
+   19   | abpf     |
+   18   | abpt     |
+   17   | alcf     |
+   16   | alct     |
+ 15:12  |          | syllable scale - see below
+ 11:10  | ctpr     | `ctpr` number used in control transfer (`ct`) instructions
+   9    | ?        |
+   8:0  | ctcond   | condition code for control transfers (`ct`)
+
+##### `ct` condition codes
+
+The condition code in the stubs syllable controls under which conditions a
+control transfer operation is executed.
+
+ Bit    | description
+--------|--------------------------------------------------------------
+  4:0   | Predicate number (from `pred0` to `pred31`)
+  7:5   | Condition mode
+
+ Mode |  syntax                       | description
+------|-------------------------------|---------------------------------
+   0  |  --                           | never (?)
+   1  |                               | always
+   2  | `? %pred0`                    | if predicate is true
+   3  | `? ~ %pred0`                  | if predicate is false (?)
+   4  | `? #LOOP_END`                 |
+   5  | `? #NOT_LOOP_END`             |
+   6  | `? %pred0 \|\| #LOOP_END`     |
+   7  | `? ~ %pred0 && #NOT_LOOP_END` |
+
 
 #### ALS - Arithmetic-logical syllables
 
@@ -196,8 +218,8 @@ CS0 and CS1 encode different operations.
   CS0     |`5xxxxxxx` | ldisp  | prepare an array prefetch program (?) in `ctpr1`
   CS0     |`6xxxxxxx` | sdisp  | prepare a system call in `ctpr1`
   CS0     |`70000000` | return | prepare to return from procedure in `ctpr1`
-  cs0     |`8xxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr2
-  cs0     |`cxxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr3
+  CS0     |`8xxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr2
+  CS0     |`cxxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr3
 
 
 
