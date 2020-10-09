@@ -188,16 +188,16 @@ Bit     | Description
 
 CS0 and CS1 encode different operations.
 
- Syllable | pattern  | name   | description
-----------|----------|--------|----------------------------------------
-  CS0     | 0xxxxxxx | set\*  | setwd/setbn/setbp/settr
-  CS0     | 300000xx | wait   | wait for specified kinds of operations to complete
-  CS0     | 4xxxxxxx | disp   | prepare a relative jump in `ctpr1`
-  CS0     | 5xxxxxxx | ldisp  | prepare an array prefetch program (?) in `ctpr1`
-  CS0     | 6xxxxxxx | sdisp  | prepare a system call in `ctpr1`
-  CS0     | 70000000 | return | prepare to return from procedure in `ctpr1`
-  cs0     | 8xxxxxxx+| --     | disp/ldisp/sdisp/return with ctpr2
-  cs0     | cxxxxxxx+| --     | disp/ldisp/sdisp/return with ctpr3
+ Syllable | pattern   | name   | description
+----------|-----------|--------|----------------------------------------
+  CS0     |`0xxxxxxx` | set\*  | setwd/setbn/setbp/settr
+  CS0     |`300000xx` | wait   | wait for specified kinds of operations to complete
+  CS0     |`4xxxxxxx` | disp   | prepare a relative jump in `ctpr1`
+  CS0     |`5xxxxxxx` | ldisp  | prepare an array prefetch program (?) in `ctpr1`
+  CS0     |`6xxxxxxx` | sdisp  | prepare a system call in `ctpr1`
+  CS0     |`70000000` | return | prepare to return from procedure in `ctpr1`
+  cs0     |`8xxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr2
+  cs0     |`cxxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr3
 
 
 
