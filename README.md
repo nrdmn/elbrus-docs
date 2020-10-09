@@ -192,6 +192,12 @@ CS0 and CS1 encode different operations.
 ----------|----------|--------|----------------------------------------
   CS0     | 0xxxxxxx | set\*  | setwd/setbn/setbp/settr
   CS0     | 300000xx | wait   | wait for specified kinds of operations to complete
+  CS0     | 4xxxxxxx | disp   | prepare a relative jump in `ctpr1`
+  CS0     | 5xxxxxxx | ldisp  | prepare an array prefetch program (?) in `ctpr1`
+  CS0     | 6xxxxxxx | sdisp  | prepare a system call in `ctpr1`
+  CS0     | 70000000 | return | prepare to return from procedure in `ctpr1`
+  cs0     | 8xxxxxxx+| --     | disp/ldisp/sdisp/return with ctpr2
+  cs0     | cxxxxxxx+| --     | disp/ldisp/sdisp/return with ctpr3
 
 
 
@@ -227,6 +233,27 @@ have to be enabled by setting the corrsponding bits in CS0.
   2     |`st_c` | wait for all previous store operations to complete
   1     |`all_e`| wait for all previous operations to issue all possible exceptions
   0     |`all_c`| wait for all previous operations to complete
+
+##### disp/ldisp/sdisp/return
+
+The `disp` operation prepares a jump to a different location by using one of
+the control transfer preparation registers (`ctpr1` to `ctpr3`).
+
+ bit    | description
+--------|--------------------------------------------------------------
+  31:30 | can be 1, 2, or 3 for `ctpr1`, `ctpr2`, or `ctpr3` respectively
+  29:28 | can be 0, 1, 2, or 3, for `disp`, `ldisp`, `sdisp`, or `return` respectively
+  27:0  | offset or system call number
+
+For `disp` and `ldisp`, the offset is relative to the start of the current
+instruction, and in multiples of eight bytes. For example, in an instruction at
+`0x1000`, with CS0=`40000042`, we get `disp %ctpr1, 0x1210`.
+
+For `sdisp`, the system call number is not shifted. `CS0=6000001a` is
+`sdisp %ctpr1, 0x1a`.
+
+The `return` operation doesn't take an offset. The offset field should be zero
+in this case.
 
 
 
