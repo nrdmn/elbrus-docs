@@ -219,118 +219,41 @@ Bit     | Description
 ------- | -------------------------------------------------------------
    31   | Speculative mode
  30:24  | Opcode
- 23:16  | Operand
- 15:8   | Operand
-  7:0   | Operand
+ 23:16  | Operand 1
+ 15:8   | Operand 2
+  7:0   | Operand 3
 
-The role of the operands depend on the opcode.
+The formats and roles of the operands depends on the opcode.
 
-##### Arithmethic-logical operation format 1 (ALOPF1)
+The following formats are known:
 
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | src1
- 15:8   | src2
-  7:0   | dst
-
-##### Arithmethic-logical operation format 2 (ALOPF2)
-
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | Opcode Extension
- 15:8   | src2
-  7:0   | dst
-
-##### Arithmethic-logical operation format 3 (ALOPF3)
-
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | src1
- 15:8   | src2
-  7:0   | src3
-
-##### Arithmethic-logical operation format 5 (ALOPF5)
-
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | Opcode Extension
- 15:8   | src2
-  7:0   | Register number
-
-##### Arithmethic-logical operation format 6 (ALOPF6)
-
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | register number
- 15:8   | (empty)
-  7:0   | dst
+ Operand format | description
+----------------|-------------------------------------------------------
+  src1          | source operand 1
+  src2          | source operand 2 - can encode access to literal syllables (LTS)
+  src3          | source operand 3
+  dst           | destination - where to store the result of an operation
+  dst2          | destination
+  regnum        | register number
+  opext         | opcode extension
 
 
-##### Arithmethic-logical operation format 7 (ALOPF7)
+Several combinations of operand formats are known:
 
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | src1
- 15:8   | src2
-  7:0   | dst2
+ Format      | operand 1 | operand 2 | operand 3 | description
+-------------|-----------|-----------|-----------|----------------------
+ ALOPF1      | src1      | src2      | dst       | Arithmethic-logical operation format 1
+ ALOPF2      | opext     | src2      | dst       | Arithmethic-logical operation format 2
+ ALOPF3      | src1      | src2      | src3      | Arithmethic-logical operation format 3
+ ALOPF5      | opext     | src2      | regnum    | Arithmethic-logical operation format 5
+ ALOPF6      | regnum    | --        | dst       | Arithmethic-logical operation format 6
+ ALOPF7      | src1      | src2      | dst2      | Arithmethic-logical operation format 7
+ ALOPF8      | opext     | src2      | dst2      | Arithmethic-logical operation format 8
+ ALOPF9      | opext     | opext     | dst       | Arithmethic-logical operation format 9
+ ALOPF10     | opext     | opext     | src3      | Arithmethic-logical operation format 10
 
-##### Arithmethic-logical operation format 8 (ALOPF8)
+TODO: ALOPF11, ALOPF12, ALOPF13, ALOPF15, ALOPF16, ALOPF17, ALOPF21, ALOPF22
 
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | Opcode Extension
- 15:8   | src2
-  7:0   | dst2
-
-##### Arithmethic-logical operation format 9 (ALOPF9)
-
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | Opcode Extension
- 15:8   | Opcode Extension
-  7:0   | dst
-
-##### Arithmethic-logical operation format 10 (ALOPF10)
-
-Bit     | Description
-------- | -------------------------------------------------------------
-   31   | Speculative mode
- 30:24  | Opcode
- 23:16  | Opcode Extension
- 15:8   | Opcode Extension
-  7:0   | src3
-
-##### Arithmethic-logical operation format 11 (ALOPF11)
-
-##### Arithmethic-logical operation format 12 (ALOPF12)
-
-##### Arithmethic-logical operation format 13 (ALOPF13)
-
-##### Arithmethic-logical operation format 15 (ALOPF15)
-
-##### Arithmethic-logical operation format 16 (ALOPF16)
-
-##### Arithmethic-logical operation format 17 (ALOPF17)
-
-##### Arithmethic-logical operation format 21 (ALOPF21)
-
-##### Arithmethic-logical operation format 22 (ALOPF22)
 
 #### ALES - Arithmetic-logical extension syllables
 
