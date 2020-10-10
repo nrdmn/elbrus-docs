@@ -18,28 +18,50 @@ mostly in Russian.
 - [Микропроцессоры и вычислительные комплексы семейства «Эльбрус»](http://www.mcst.ru/doc/book_121130.pdf)
 
 
-## Structure
+## Memory organization
 
-### Stacks
+Most operations in Elbrus code either:
 
-#### Procedure stack (стек процедур)
-The procedure stack contains parameters and local data of procedures. Its top area is stored in the register file (RF). On overflow or underflow of the register file, its contents are automatically swapped in/out of memory. Launch of a new procedure allocates a window on the procedure stack, which may overlap with the calling procedure's window.
+- Take the values of one or more registers, compute a function, and write the
+  result to another register, or
+- Load a value from memory into a register or store a value from a
+  register into memory.
 
-Register PSHTP (procedure stack hardware top pointer) (insert description here)
 
-Register PSP (procedure stack pointer) contains the virtual base address of the procedure stack.
+### Register file, RF (Регистровый файл , РгФ)
 
-Register WD (window descriptor) contains the base and the size of the current procedure's window into the procedure stack.
+The 256 general-purpose registers of the Register File (RF/РгФ) are divided
+into two categories:
 
-#### User stack (стек пользователя)
-Stack for dynamic allocation (?)
+- 224 registers are part of the _procedure stack_ in a
+  [windowed](https://en.wikipedia.org/wiki/Register_window) way. They can
+  become available or unavailable during procedure calls and returns.
+  (See also [elbrus-prog chapter 9.3.1.1](http://ftp.altlinux.org/pub/people/mike/elbrus/docs/elbrus_prog/html/chapter9.html#mech-register-window))
+- 32 registers are global registers. They are available during the whole
+  runtime of a program.
 
-Register USBR (user stack base pointer, РгБСП)
+ 32-bit | 64-bit | description
+--------|--------|-----------------------------------
+ `%g0`  |`%dg0`  | Global register (0-31)
+ `%r0`  |`%dr0`  | Procedure stack register, relative to start of current window
+ `%b[0]`|`%db[0]`| [Mobile base registers](http://ftp.altlinux.org/pub/people/mike/elbrus/docs/elbrus_prog/html/chapter9.html#baseregisters), relative to the start of the current window, plus `BR`
 
-Register USD (user stack descriptor, ДСП)
+TODO: last eight global registers are designated rotating area
 
-#### Procedure chain stack (стек связующей информации)
-Stack of return addresses. It can only be manipulated by the operating system and the hardware. Its top area is stored in CF (chain file) registers.
+
+#### Changing the register window
+
+The procedure stack contains parameters and local data of procedures. Its top
+area is stored in the register file (RF). On overflow or underflow of the
+register file, its contents are automatically swapped in/out of memory. Launch
+of a new procedure allocates a window on the procedure stack, which may overlap
+with the calling procedure's window.
+
+
+### Procedure chain stack (стек связующей информации)
+
+Stack of return addresses. It can only be manipulated by the operating system
+and the hardware. Its top area is stored in CF (chain file) registers.
 
 On this stack the following information is encoded in two quad words:
 - return address
@@ -51,35 +73,36 @@ On this stack the following information is encoded in two quad words:
 - rotating area base
 - processor status register
 
-On overflow or underflow of the chain file, its contents are automatically swapped in/out of memory.
+On overflow or underflow of the chain file, its contents are automatically
+swapped in/out of memory.
 
-Register PCSHTP (procedure chain stack hardware top pointer) (insert description here)
 
-### Registers
-#### Register file, RF (Регистровый файл , РгФ)
-The register file has 256 registers, 84 bit each. Each of the registers holds two 32 bit values with two bit tags or a 64 bit value, and a 16 bit ordering value.
+### Predicate file, PF (Предикатный файл, ПФ)
 
-The first 224 registers are procedure stack registers, the other 32 are global registers.
+Comparison operations produce one-bit results (true or false) that can be
+stored in the predicate registers.
 
-TODO: %r, %b, %g, %dr, %db, %dg
+Predicates can be used in conditional control transfers (jumps/calls), or in
+the conditional execution of individual operations.
 
-TODO: Register window (Window descriptor, WD)
+There are 32 predicate registers in the predicate file, which appear as
+`%pred0` to `%pred31` in assembly code.
 
-Accessing procedure stack registers is cyclic, i.e. after %r223 follows %r0.
 
-TODO: Rotatable area area of procedure stack registers
-TODO: last eight global registers are designated rotating area
+### Special purpose registers
 
-#### Predicate file, PF (Предикатный файл, ПФ)
-TODO: 32 two-bit predicates.
-
-#### Chain file, CF 
-
-#### Special purpose registers
+Special purpose registers can be read using the `rrs` and `rrd` operations, and
+writing using the `rws` and `rwd` operations.
 
  Name   | Description
 --------|--------------------------------------------------------------
  CUIR   | compilation unit index register, индекс дескрипторов модуля компиляции
+ PSHTP  | procedure stack hardware top pointer
+ PSP    | procedure stack pointer - contains the virtual base address of the procedure stack.
+ WD     | window descriptor - contains the base and the size of the current procedure's window into the procedure stack.
+ PCSHTP | procedure chain stack hardware top pointer
+ USBR   | user stack base pointer, РгБСП
+ USD    | user stack descriptor, ДСП
 
 
 ## Regular Instructions
