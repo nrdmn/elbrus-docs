@@ -82,25 +82,25 @@ TODO: 32 two-bit predicates.
  CUIR   | compilation unit index register, индекс дескрипторов модуля компиляции
 
 
-## Instructions
+## Regular Instructions
 
-Elbrus' wide instructions (широкая команда, ШК) are comprised of a header syllable and one or more operation syllables. Wide instructions are 8 byte aligned.
+Elbrus' wide instructions (широкая команда, ШК) are comprised of a header syllable and zero or more additional syllables. Wide instructions are 8 byte aligned and up to 16 words (64 bytes) long.
 
 ### Syllables
 
 Abbreviation | Description
----|---
-HS   | Header syllable - it encodes length and structure of a wide instruction
-SS   | Stubs syllable - short operations that take only a few bits to encode
-ALS  | Arithmetic logic channel syllable
-CS   | Control syllable
-ALES | Arithmetic logic extension channel semi-syllable. They extend corresponding ALS. ALES2 and ALES5 are only available on Elbrus v4 and higher.
-AAS  | Array access semi-syllable
-LTS  | Literal syllable - literals to be used as operands
-PLS  | Predicate logic syllable - processing of boolean values
-CDS  | Conditional syllable - specified which operations are to be executed under which condition
+-------------|---------------------------------------------------------
+HS           | Header syllable - it encodes length and structure of a wide instruction
+SS           | Stubs syllable - short operations that take only a few bits to encode
+ALS          | Arithmetic logic channel syllable
+CS           | Control syllable
+ALES         | Arithmetic logic extension channel semi-syllable. They extend corresponding ALS. ALES2 and ALES5 are only available on Elbrus v4 and higher.
+AAS          | Array access semi-syllable
+LTS          | Literal syllable - literals to be used as operands
+PLS          | Predicate logic syllable - processing of boolean values
+CDS          | Conditional syllable - specified which operations are to be executed under which condition
 
-The first syllable is the header syllable.
+The first syllable is the header syllable. It is always present.
 Presence of other syllables depend on the purpose of the command.
 Syllables occur in the following order:
 
@@ -108,12 +108,33 @@ Syllables occur in the following order:
 - SS
 - ALS0, ALS1, ALS2, ALS3, ALS4, ALS5
 - CS0, CS1
-- ALES2, ALES5, ALES0, ALES1, ALES3, ALES4
+- ALES2, ALES5
+- ALES0, ALES1, ALES3, ALES4
 - AAS0, AAS1, AAS2, AAS3, AAS4, AAS5
 - LTS3, LTS2, LTS1, LTS0
 - PLS2, PLS1, PLS0
 - CDS2, CDS1, CDS0
 
+#### Syllable packing
+
+Semi-syllables ALES and AAS are a half-word (2 bytes) long. All other syllables are one word (4 bytes) long.
+
+Syllables SS, ALS\* and CS\* occur as indicated in the header syllable in the order described above.
+They are packed, e.g. if header bits indicate presence of ALS0 and ALS2 but not SS nor ALS1, then the syllable ALS0 follows directly after HS and ALS2 follows directly after ALS0.
+
+If presence of ALES2 or ALES5 is indicated, then a whole word is allocated for them, whether both are present or not.
+The first of both to be present occupies the more significant half of the word, the second is encoded in the less significant half.
+For example, when looking at the syllables as bytes, if ALES2 and ALES5 are present, then the first two bytes of the little endian word contain ALES5 and the last two bytes contain ALES2.
+If only ALES5 is present, the first two bytes are empty and the last two bytes contain ALES5.
+
+ALES{0,1,3,4} and AAS\* start at the word indicated by the "middle pointer" from the header syllable. Their ordering is the same as for ALES2 and ALES5 (high half first, low half second) but they are all packed. This means that any two syllables of ALES{0,1,3,4} and AAS{0,1} may share a word. ALES\* may not share a word with AAS{2,3,4,5} because presence of the latter implies presence of AAS0 and/or AAS1.
+For example, if ALES0, ALES1, ALES4, AAS0 and AAS2 are indicated, then they are encoded as ALES1, ALES0, AAS0, ALES4, two bytes left empty, and finally AAS2.
+
+LTS\*, PLS\* and CDS\* are decoded starting from the end of the wide command.
+CDS\* and PLS\* are not indicated by individual flags but rather by their number. For example, there cannot be a PLS2 without a PLS0 and PLS1.
+LTS take any remaining words between the other syllables. For example, if after the AAS there are five words remaining in the wide command and two CDS and one PLS are indicated, then two words for LTS are left. They would be encoded as LTS1, LTS0, PLS0, CDS1, CDS0.
+
+We do not know what happens if more syllables are indicated than there is space allocated or if syllables are encoded to overlap.
 
 #### HS - Header syllable
 
@@ -141,7 +162,7 @@ Bit     | Name          | Description
    10   | loop_mode     |
    9:7  | nop           |
    6:4  |               | Length of instruction, in multiples of 8 bytes, minus 8 bytes
-   3:0  |               | Number of syllables occupied by SS, ALS, CS, ALES2, ALES5 - called "middle pointer"
+   3:0  |               | Number of words occupied by SS, ALS, CS, ALES2, ALES5 - called "middle pointer"
 
 #### SS - Stubs syllable
 
@@ -162,7 +183,10 @@ Bit     | Name     | Description
    18   | abpt     |
    17   | alcf     |
    16   | alct     |
- 15:12  |          | syllable scale - see below
+   15   |          | array access syllable 0 and 2 presence
+   14   |          | array access syllable 0 and 3 presence
+   13   |          | array access syllable 1 and 4 presence
+   12   |          | array access syllable 1 and 5 presence
  11:10  | ctpr     | `ctpr` number used in control transfer (`ct`) instructions
    9    | ?        |
    8:0  | ctcond   | condition code for control transfers (`ct`)
@@ -195,16 +219,125 @@ Bit     | Description
 ------- | -------------------------------------------------------------
    31   | Speculative mode
  30:24  | Opcode
- 23:16  | Source operand
- 15:8   | Source operand
-  7:0   | Destination operand
+ 23:16  | Operand
+ 15:8   | Operand
+  7:0   | Operand
+
+The role of the operands depend on the opcode.
+
+##### Arithmethic-logical operation format 1 (ALOPF1)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | src1
+ 15:8   | src2
+  7:0   | dst
+
+##### Arithmethic-logical operation format 2 (ALOPF2)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | Opcode Extension
+ 15:8   | src2
+  7:0   | dst
+
+##### Arithmethic-logical operation format 3 (ALOPF3)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | src1
+ 15:8   | src2
+  7:0   | src3
+
+##### Arithmethic-logical operation format 5 (ALOPF5)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | Opcode Extension
+ 15:8   | src2
+  7:0   | Register number
+
+##### Arithmethic-logical operation format 6 (ALOPF6)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | register number
+ 15:8   | (empty)
+  7:0   | dst
+
+
+##### Arithmethic-logical operation format 7 (ALOPF7)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | src1
+ 15:8   | src2
+  7:0   | dst2
+
+##### Arithmethic-logical operation format 8 (ALOPF8)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | Opcode Extension
+ 15:8   | src2
+  7:0   | dst2
+
+##### Arithmethic-logical operation format 9 (ALOPF9)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | Opcode Extension
+ 15:8   | Opcode Extension
+  7:0   | dst
+
+##### Arithmethic-logical operation format 10 (ALOPF10)
+
+Bit     | Description
+------- | -------------------------------------------------------------
+   31   | Speculative mode
+ 30:24  | Opcode
+ 23:16  | Opcode Extension
+ 15:8   | Opcode Extension
+  7:0   | src3
+
+##### Arithmethic-logical operation format 11 (ALOPF11)
+
+##### Arithmethic-logical operation format 12 (ALOPF12)
+
+##### Arithmethic-logical operation format 13 (ALOPF13)
+
+##### Arithmethic-logical operation format 15 (ALOPF15)
+
+##### Arithmethic-logical operation format 16 (ALOPF16)
+
+##### Arithmethic-logical operation format 17 (ALOPF17)
+
+##### Arithmethic-logical operation format 21 (ALOPF21)
+
+##### Arithmethic-logical operation format 22 (ALOPF22)
 
 #### ALES - Arithmetic-logical extension syllables
 
 Bit     | Description
 ------- | -------------------------------------------------------------
   15:8  | Opcode 2
-   7:0  | Extension
+   7:0  | Extension or src3
 
 #### CS - Control syllables
 
@@ -296,63 +429,5 @@ Pattern   | Range | Applicability | Description
 111x xxxx | e0-ff |               | global register
 1111 1xxx | f8-ff |               | Rotatable area global register
 
-
-## Decoding
-
-### Group 1
-
-Syllables occur in the following order: SS, ALS0, ALS1, ALS2, ALS3, ALS4, ALS5, CS0
-
-Scale index | Indicated by | Syllable
---- | --- | ---
-1 | HS[12] | SS
-2 | HS[26] | ALS0
-3 | HS[27] | ALS1
-4 | HS[28] | ALS2
-5 | HS[29] | ALS3
-6 | HS[30] | ALS4
-7 | HS[31] | ALS5
-8 | HS[14] | CS0
-
-### Group 2
-
-Syllables occur in the following order: CS1, ALES2, ALES5, ALES0, ALES1, ALES3, ALES4, AAS0, AAS1, AAS2, AAS3, AAS4, AAS5
-
-ALES and AAS are semi-syllables. **In a syllable, the higher (more significant) half is decoded first, then the lower half.**
-
-ALES2 and ALES5 are only available on Elbrus v4 and higher. If any of ALES2 or ALES5 is present, they get their own syllable that is not shared with the other ALES or AAS syllables.
-
-Scale index | Indicated by | Syllable
---- | --- | ---
-9 | HS[15] | CS1
-10 | HS[20] | ALES0
-11 | HS[21] | ALES1
-12 | HS[22] | ALES2
-13 | HS[23] | ALES3
-14 | HS[24] | ALES4
-15 | HS[25] | ALES5
-16 | SS[12] or SS[13] | AAS0
-17 | SS[14] or SS[15] | AAS1
-18 | SS[12] | AAS2
-19 | SS[13] | AAS3
-20 | SS[14] | AAS4
-21 | SS[15] | AAS5
-
-### Group 3
-
-Syllables occur in the following order: LTS3, LTS2, LTS1, LTS0, PLS2, PLS1, PLS0, CDS2, CDS1, CDS0
-
-Group 3 is decoded from right to left. Any syllables not belonging to a different category are literal syllables.
-
-Scale index | Indicated by | Syllable
---- | --- | ---
-22 | - | LTS3
-23 | - | LTS2
-24 | - | LTS1
-25 | - | LTS0
-26 | HS[19:18] == 3 | PLS2
-27 | HS[19:18] >= 2 | PLS1
-28 | HS[19:18] >= 1 | PLS0
-29 | HS[17:16] == 3 | CDS2
-30 | HS[17:16] >= 2 | CDS1
-31 | HS[17:16] >= 1 | CDS0
+## Array Prefetch Instructions
+TODO
