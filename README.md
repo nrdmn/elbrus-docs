@@ -201,7 +201,7 @@ Bit     | Name     | Description
    23   | abgd     |
    22   | abnf     |
    21   | abnt     |
-   20   | ?        |
+   20   | type     | Almost always 0
    19   | abpf     |
    18   | abpt     |
    17   | alcf     |
@@ -210,7 +210,7 @@ Bit     | Name     | Description
    14   |          | array access syllable 0 and 3 presence
    13   |          | array access syllable 1 and 4 presence
    12   |          | array access syllable 1 and 5 presence
- 11:10  | ctpr     | `ctpr` number used in control transfer (`ct`) instructions
+ 11:10  | ctop     | `ctpr` number used in control transfer (`ct`) instructions
    9    | ?        |
    8:0  | ctcond   | condition code for control transfers (`ct`)
 
@@ -222,19 +222,28 @@ control transfer operation is executed.
  Bit    | description
 --------|--------------------------------------------------------------
   4:0   | Predicate number (from `pred0` to `pred31`)
-  7:5   | Condition mode
+  8:5   | Condition type
 
- Mode |  syntax                       | description
+ Type |  syntax                       | description
 ------|-------------------------------|---------------------------------
-   0  |  --                           | never (?)
+   0  | --                            | never
    1  |                               | always
    2  | `? %pred0`                    | if predicate is true
-   3  | `? ~ %pred0`                  | if predicate is false (?)
+   3  | `? ~ %pred0`                  | if predicate is false
    4  | `? #LOOP_END`                 |
    5  | `? #NOT_LOOP_END`             |
    6  | `? %pred0 \|\| #LOOP_END`     |
    7  | `? ~ %pred0 && #NOT_LOOP_END` |
+   8  | (TODO, depends on syllable)   |
+   9  | (TODO, depends on syllable)   |
+  10  | (reserved)                    |
+  11  | (reserved)                    |
+  12  | (reserved)                    |
+  13  | (reserved)                    |
+  14  | `? ~ %pred0 \|\| #LOOP_END`   |
+  15  | `? %pred0 && #NOT_LOOP_END`   |
 
+`#LOOP_END` and `#NOT_LOOP_END` are sometimes spelled as `%LOOP_END` and `%NOT_LOOP_END`.
 
 #### ALS - Arithmetic-logical syllables
 
