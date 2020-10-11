@@ -385,4 +385,11 @@ Pattern   | Range | Applicability | Description
 1111 1xxx | f8-ff |               | Rotatable area global register
 
 ## Array Prefetch Instructions
-TODO
+
+Array prefetch instructions are run asynchronously on the array access unit.
+They are always 16 bytes long.
+To write array prefetch instructions, the mnemonic `fapb` is used.
+To call an array prefetch program, load its address with ldisp to %ctpr2 (no need to call or ct).
+Even though array prefetch instructions should only ever be called by ldisp and are not processed using the same facilities as
+regular instructions, they always seem to be terminated by a regular branch instruction.
+The maximum length of an array prefetch program is 32 instructions.
