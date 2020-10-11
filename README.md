@@ -189,6 +189,8 @@ Bit     | Name          | Description
 
 #### SS - Stubs syllable
 
+##### Stubs syllable format 1 - SF1
+
 Bit     | Name     | Description
 --------|----------|----------------------------------------------
  31:30  | ipd      | instruction prefetch depth
@@ -201,7 +203,7 @@ Bit     | Name     | Description
    23   | abgd     |
    22   | abnf     |
    21   | abnt     |
-   20   | type     | Almost always 0
+   20   | type     | type is 0 for SF1
    19   | abpf     |
    18   | abpt     |
    17   | alcf     |
@@ -213,6 +215,25 @@ Bit     | Name     | Description
  11:10  | ctop     | `ctpr` number used in control transfer (`ct`) instructions
    9    | ?        |
    8:0  | ctcond   | condition code for control transfers (`ct`)
+
+##### Stubs syllable format 2 - SF2
+
+Bit     | Name     | Description
+--------|----------|----------------------------------------------
+ 31:30  | ipd      | instruction prefetch depth
+ 29:28  |          | encodes invts and flushts, see below
+   27   | srp (?)  |
+   26   |          | encodes invts and flushts, see below
+   25   | crp (?)  |
+   20   | type     | type is 1 for SF2
+
+`(ss >> 27 & 6) \| (ss >> 26 & 1)`   | Description
+-----------------------------------|------------
+ 2 | `invts`
+ 3 | `flushts`
+ 6 | `invts ? %predN`, where N is `ss & 0x1f`
+ 7 | `invts ? ~ %predN`, where N is `ss & 0x1f`
+
 
 ##### `ct` condition codes
 
