@@ -399,7 +399,7 @@ Pattern   | Range | Applicability | Description
 10xx xxxx | 80-bf |               | procedure stack register
 1100 xxxx | c0-cf |               | constant between 0 and 15
 1101 xxxx | d0-df | not in src2   | constant between 16 and 31
-1101 0xxx | d0-d7 | only in src2  | reference to 16 bit literal semi-syllable; (1<<2) indicates high half of a LTS
+1101 0xxx | d0-d7 | only in src2  | reference to 16 bit literal semi-syllable; (1<<2) indicates high half of a LTS; Only in lts0 and lts1.
 1101 10xx | d8-db | only in src2  | reference to 32 bit literal syllable LTS0, LTS1, LTS2, or LTS3
 1101 11xx | dc-df | only in src2  | reference to 64 bit literal syllable pair (LTS0 and LTS1, LTS1 and LTS2, LTS2 and LTS3)
 111x xxxx | e0-ff |               | global register
