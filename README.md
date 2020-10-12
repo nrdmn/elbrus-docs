@@ -380,6 +380,8 @@ For `disp` and `ldisp`, the offset is relative to the start of the current
 instruction, and in multiples of eight bytes. For example, in an instruction at
 `0x1000`, with CS0=`40000042`, we get `disp %ctpr1, 0x1210`.
 
+`ldisp` is only allowed with `ctpr2`.
+
 For `sdisp`, the system call number is not shifted. `CS0=6000001a` is
 `sdisp %ctpr1, 0x1a`.
 
