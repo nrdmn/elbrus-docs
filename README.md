@@ -355,11 +355,11 @@ Several operand formats are defined:
  ALOPF11 | x    | x    |      | x   | muls               | Some opcodes require a literal in `ales[7:0]`, all others have an opcode extension number there.
  ALOPF12 |      | x    |      | x   | fsqrts             | The opcode extension number is in `als[23:16]` and `ales[7:0]`. Opcode `pshufh` is special as it requires a literal in `ales[7:0]` instead.
  ALOPF13 | x    | x    | x    |     | stq                | `src3` in ALS
- ALOPF15 |      | x    |      | x   | rws, rwd           | `dst` is a status register; `ales[7:0]` is EXT (1), `ales[15:8]` is `0xc0`
- ALOPF16 | x    |      |      | x   | rrs, rrd           | `src2` is a status register; `ales[7:0]` is EXT (1), `ales[15:8]` is `0xc0`
- ALOPF17 | x    | x    |      | x   | pcmpeqbop          | `dst` is a predicate register; `ales[7:0]` holds the cmp opcode extension number; opcode 2 is EXT1 (2)
+ ALOPF15 |      | x    |      | x   | rws, rwd           | `dst` is a status register; opcode 2 is EXT (1), extension is `0xc0`
+ ALOPF16 | x    |      |      | x   | rrs, rrd           | `src2` is a status register; opcode 2 is EXT (1), extension is `0xc0`
+ ALOPF17 | x    | x    |      | x   | pcmpeqbop          | `dst` is a predicate register; opcode 2 is EXT1 (2)
  ALOPF21 | x    | x    | x    | x   | incs\_fb           | `src3` in ALES
- ALOPF22 |      | x    |      | x   | movtq              | The opcode extension number is in `als[23:16]`; `ales[7:0]` is EXT (1), `ales[15:8]` is `0xc0`
+ ALOPF22 |      | x    |      | x   | movtq              | The opcode extension number is in `als[23:16]`; opcode 2 is EXT (1), the extension field in ALES is set to `0xc0`
 
 TODO: ALOPF5, ALOPF6, ALOPF9, ALOPF10, ALOPF19
 
@@ -370,7 +370,7 @@ It is not clear what the difference between ALOPF1 and ALOPF11 is.
 Bit     | Description
 ------- | -------------------------------------------------------------
   15:8  | Opcode 2
-   7:0  | src3 (in ALEF1) or extension (in ALEF2)
+   7:0  | src3 (in ALEF1) or extension or cmp opcode extension number (in ALEF2)
 
  Opcode 2 | Name
 ----------|-------------
