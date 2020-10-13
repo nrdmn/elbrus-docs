@@ -46,7 +46,7 @@ into two categories:
  `%r0`  |`%dr0`  | Procedure stack register, relative to start of current window
  `%b[0]`|`%db[0]`| [Mobile base registers](http://ftp.altlinux.org/pub/people/mike/elbrus/docs/elbrus_prog/html/chapter9.html#baseregisters), relative to the start of the current window, plus `BR`
 
-TODO: last eight global registers are designated rotating area
+TODO: last eight global registers are designated rotatable area
 
 
 #### Changing the register window
@@ -70,7 +70,7 @@ On this stack the following information is encoded in two quad words:
 - presence of real 80 (?)
 - predicate file
 - user stack descriptor
-- rotating area base
+- rotatable area base
 - processor status register
 
 On overflow or underflow of the chain file, its contents are automatically
@@ -179,10 +179,10 @@ Bit     | Name          | Description
  17:16  | CDS           | number of conditional execution syllables
    15   | CS1           | control syllable 1 presence
    14   | CS0           | control syllable 0 presence
-   13   | set_mark      |
+   13   | set\_mark     |
    12   | SS            | stub syllable presence
    11   | --            | unused
-   10   | loop_mode     |
+   10   | loop\_mode    |
    9:7  | nop           |
    6:4  |               | Length of instruction, in multiples of 8 bytes, minus 8 bytes
    3:0  |               | Number of words occupied by SS, ALS, CS, ALES2, ALES5 - called "middle pointer"
