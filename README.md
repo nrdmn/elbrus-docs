@@ -359,7 +359,7 @@ Several operand formats are defined:
  ALOPF16 | x    |      |      | x   | rrs, rrd           | `src2` is a status register; `ales[7:0]` is EXT (1), `ales[15:8]` is `0xc0`
  ALOPF17 | x    | x    |      | x   | pcmpeqbop          | `dst` is a predicate register; `ales[7:0]` holds the cmp opcode extension number; opcode 2 is EXT1 (2)
  ALOPF21 | x    | x    | x    | x   | incs\_fb           | `src3` in ALES
- ALOPF22 |      | x    |      | x   | movtq              | The opcode extension number is in `als[23:16]`; `ales & 0xff` is EXT (1), `ales[15:8]` is `0xc0`
+ ALOPF22 |      | x    |      | x   | movtq              | The opcode extension number is in `als[23:16]`; `ales[7:0]` is EXT (1), `ales[15:8]` is `0xc0`
 
 TODO: ALOPF5, ALOPF6, ALOPF9, ALOPF10, ALOPF19
 
