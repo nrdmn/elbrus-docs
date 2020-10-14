@@ -345,25 +345,27 @@ Pattern   | Range | Description
 
 Several operand formats are defined:
 
- Format  | src1 | src2 | src3 | dst | Example            | Comment
----------|------|------|------|-----|--------------------|----------
- ALOPF1  | x    | x    |      | x   | adds, ld{b,h,w,d}  |
- ALOPF2  |      | x    |      | x   | movx, popcnts      | Opcode `getsp` needs ALES even though it is ALOPF2; opcode extension number in `als[23:16]`
- ALOPF3  | x    | x    | x    |     | st{b,h,w,d}        | `src3` in ALS
- ALOPF7  | x    | x    |      | x   | cmposb             | `dst` is a predicate register; `als[7:5]` holds the cmp opcode extension number
- ALOPF8  |      | x    |      | x   | cctopo             | `dst` is a predicate register; `als[7:5]` holds the cmp opcode extension number
- ALOPF11 | x    | x    |      | x   | muls               | Some opcodes require a literal in `ales[7:0]`, all others have an opcode extension number there.
- ALOPF12 |      | x    |      | x   | fsqrts             | The opcode extension number is in `als[23:16]` and `ales[7:0]`. Opcode `pshufh` is special as it requires a literal in `ales[7:0]` instead.
- ALOPF13 | x    | x    | x    |     | stq                | `src3` in ALS
- ALOPF15 |      | x    |      | x   | rws, rwd           | `dst` is a status register; opcode 2 is EXT (1), extension is `0xc0`
- ALOPF16 | x    |      |      | x   | rrs, rrd           | `src2` is a status register; opcode 2 is EXT (1), extension is `0xc0`
- ALOPF17 | x    | x    |      | x   | pcmpeqbop          | `dst` is a predicate register; opcode 2 is EXT1 (2)
- ALOPF21 | x    | x    | x    | x   | incs\_fb           | `src3` in ALES
- ALOPF22 |      | x    |      | x   | movtq              | The opcode extension number is in `als[23:16]`; opcode 2 is EXT (1), the extension field in ALES is set to `0xc0`
+ Format  | src1 | src2 | src3 | dst | has ext    | Example            | Comment
+---------|------|------|------|-----|------------|----------|----------
+ ALOPF1  | x    | x    |      | x   | no         | adds, ld{b,h,w,d}  |
+ ALOPF2  |      | x    |      | x   | als[23:16] | movx, popcnts      | Opcode `getsp` needs ALES even though it is ALOPF2; opcode extension number in `als[23:16]`
+ ALOPF3  | x    | x    | x    |     | no         |  st{b,h,w,d}        | `src3` in ALS
+ ALOPF7  | x    | x    |      | x   | als[7:5]   |  cmposb             | `dst` is a predicate register; `als[7:5]` holds the cmp opcode extension number
+ ALOPF8  |      | x    |      | x   | als[7:5]   |  cctopo             | `dst` is a predicate register; `als[7:5]` holds the cmp opcode extension number
+ ALOPF11 | x    | x    |      | x   | ales[7:0]  |  muls               | Some opcodes require a literal in `ales[7:0]`, all others have an opcode extension number there.
+ ALOPF12 |      | x    |      | x   |            |  fsqrts             | The opcode extension number is in `als[23:16]` and `ales[7:0]`. Opcode `pshufh` is special as it requires a literal in `ales[7:0]` instead.
+ ALOPF13 | x    | x    | x    |     |            |  stq                | `src3` in ALS
+ ALOPF15 |      | x    |      | x   |            |  rws, rwd           | `dst` is a status register; opcode 2 is EXT (1), extension is `0xc0`
+ ALOPF16 | x    |      |      | x   |            |  rrs, rrd           | `src2` is a status register; opcode 2 is EXT (1), extension is `0xc0`
+ ALOPF17 | x    | x    |      | x   |            |  pcmpeqbop          | `dst` is a predicate register; opcode 2 is EXT1 (2)
+ ALOPF21 | x    | x    | x    | x   | no         |  incs\_fb           | `src3` in ALES
+ ALOPF22 |      | x    |      | x   |            |  movtq              | The opcode extension number is in `als[23:16]`; opcode 2 is EXT (1), the extension field in ALES is set to `0xc0`
 
 TODO: ALOPF5, ALOPF6, ALOPF9, ALOPF10, ALOPF19
 
 It is not clear what the difference between ALOPF1 and ALOPF11 is.
+
+TODO: seems like ALS and ALES can have different opcode extension numbers
 
 #### ALES - Arithmetic-logical extension syllables
 
