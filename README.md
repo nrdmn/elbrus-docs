@@ -507,7 +507,7 @@ The MAS can be independently specified for load and store operations, in CS1:
 
 Array prefetch instructions are run asynchronously on the array access unit.
 They are always 16 bytes long.
-To write array prefetch instructions, the mnemonic `fapb` is used.
+To assemble array prefetch instructions, the mnemonic `fapb` is used.
 To call an array prefetch program, load its address with ldisp to %ctpr2 (no need to call or ct).
 Even though array prefetch instructions should only ever be called by ldisp and are not processed using the same facilities as
 regular instructions, they always seem to be terminated by a regular branch instruction.
