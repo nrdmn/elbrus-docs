@@ -414,14 +414,19 @@ CS0 and CS1 encode different operations.
 
  Syllable | pattern   | name   | description
 ----------|-----------|--------|----------------------------------------
-  CS0     |`0xxxxxxx` | set\*  | setwd/setbn/setbp/settr
-  CS0     |`300000xx` | wait   | wait for specified kinds of operations to complete
-  CS0     |`4xxxxxxx` | disp   | prepare a relative jump in `ctpr1`
-  CS0     |`5xxxxxxx` | ldisp  | prepare an array prefetch program (?) in `ctpr1`
-  CS0     |`6xxxxxxx` | sdisp  | prepare a system call in `ctpr1`
-  CS0     |`70000000` | return | prepare to return from procedure in `ctpr1`
-  CS0     |`8xxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr2
-  CS0     |`cxxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr3
+ CS0, CS1 |`0xxxxxxx` | set\*  | setwd/setbn/setbp/settr
+      CS1 |`1xxxxxxx` | vrfpsz | vrfpsz + setwd/setbn/setbp/settr
+ CS0      |`2xxxxxxx` | puttsd | puttsd with a multiple-of-8 parameter relative to the start of the current instruction
+      CS1 |`200000xx` | setei  |
+      CS1 |`28000000` | setsft |
+ CS0, CS1 |`300000xx` | wait   | wait for specified kinds of operations to complete
+ CS0      |`4xxxxxxx` | disp   | prepare a relative jump in `ctpr1`
+ CS0      |`5xxxxxxx` | ldisp  | prepare an array prefetch program (?) in `ctpr1`
+ CS0      |`6xxxxxxx` | sdisp  | prepare a system call in `ctpr1`
+ CS0      |`70000000` | return | prepare to return from procedure in `ctpr1`
+ CS0      |`8xxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr2
+ CS0      |`cxxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr3
+      CS1 |`6xxxx000` | setmas | Set memory address specifier for load and store operations
 
 
 
@@ -436,15 +441,18 @@ have to be enabled by setting the corrsponding bits in CS0.
 
  Syl. | bit    | name        | description
 ------|--------|-------------|-----------------------------------------
- CS0  |     27 |enable settr |
- CS0  |     26 |enable setbn |
- CS0  |     25 |enable setbp |
- CS0  |  22:18 | setbp psz=x |
- CS0  |  17:12 | setbn rcur=x|
- CS0  |  11:6  | setbn rsz=x |
- CS0  |   5:0  | setbn rbs=x |
- LTS0 |     4  | setwd nfx=x |
+ CS1  |     28 |enable vfrpsz|
+ CS   |     27 |enable settr |
+ CS   |     26 |enable setbn |
+ CS   |     25 |enable setbp |
+ CS   |  22:18 | setbp psz=x |
+ CS   |  17:12 | setbn rcur=x|
+ CS   |  11:6  | setbn rsz=x |
+ CS   |   5:0  | setbn rbs=x |
+ LTS0 |  16:12 |vfrpsz rpsz=x|
  LTS0 |  11:5  | setwd wsz=x |
+ LTS0 |     4  | setwd nfx=x |
+ LTS0 |     3  | setwd dbl=x |
 
 
 ##### wait
@@ -480,6 +488,19 @@ For `sdisp`, the system call number is not shifted. `CS0=6000001a` is
 
 The `return` operation doesn't take an offset. The offset field should be zero
 in this case.
+
+##### setmas (setting the memory address specifier)
+
+[Memory address specifiers](https://repo.or.cz/linux/elbrus.git/blob/HEAD:/arch/e2k/include/asm/mas.h)
+control multiple aspects of load and store operations. Their 7-bit format is
+described elsewhere.
+
+The MAS can be independently specified for load and store operations, in CS1:
+
+ CS1 bits | description
+----------|-------------------------------------------------------------
+  27:21   | MAS for load operations
+  20:14   | MAS for store operations
 
 
 ## Array Prefetch Instructions
