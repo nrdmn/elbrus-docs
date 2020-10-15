@@ -278,9 +278,12 @@ control transfer operation is executed.
 All arithmetic-logical operations that are encoded in ALS are identified by an opcode at `als[30:24]`
 and possibly an opcode extension number and/or cmp opcode extension number and/or opcode 2.
 The role of the other bits in the ALS depends on the operation's format (ALOPF).
-Some operations require two ALS. Some operations require a Memory Access Specifier (MAS) in CS1.
-Some operations have predicates. Some operations require additional data from CDS.
-ALOPF1, ALOPF2, ALOPF3, ALOPF7, ALOPF8 require no ALES (getsp is an exception), all others seem to require an ALES.
+
+Other variations:
+- Some operations require two ALS
+- Some operations require a Memory Address Specifier (MAS) in CS1
+- Some operations have predicates. Some operations require additional data from CDS.
+- ALOPF1, ALOPF2, ALOPF3, ALOPF7, ALOPF8 require no ALES (getsp is an exception), all others seem to require an ALES.
 
 Bit     | Description
 ------- | -------------------------------------------------------------
