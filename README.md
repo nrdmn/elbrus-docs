@@ -512,3 +512,43 @@ To call an array prefetch program, load its address with ldisp to %ctpr2 (no nee
 Even though array prefetch instructions should only ever be called by ldisp and are not processed using the same facilities as
 regular instructions, they always seem to be terminated by a regular branch instruction.
 The maximum length of an array prefetch program is 32 instructions.
+
+
+
+## List of ALU operations
+
+ALU operations are generally identified by several aspects:
+
+- The opcode field in the ALS
+- If a corrsponding ALES exists, the opcode2 field in the ALES
+- The ALUs in which the operation can be performed. Sometimes the same opcode
+  can mean different operations in different ALUs (numbered from 0 to 5)
+
+The following tables are grouped by opcode2 and sorted by opcode.
+
+
+### Short operations (without ALES)
+
+ Opcode | ALUs | name     | ALS[23:16]| ALS[15:8] | ALS[7:0]  | data width | description
+--------|------|----------|-----------|-----------|-----------|------------|--------------------------
+  0x00  | all  | ands     |  src1     |  src2     |  dst      | 32 bits    | Compute bit-wise AND of src1 and src2, store result in dst
+  0x01  | all  | andd     |  src1     |  src2     |  dst      | 64 bits    | Compute bit-wise AND of src1 and src2, store result in dst
+  0x10  | all  | adds     |  src1     |  src2     |  dst      | 32 bits    | Compute bit-wise AND of src1 and src2, store result in dst
+  0x11  | all  | addd     |  src1     |  src2     |  dst      | 64 bits    | Compute bit-wise AND of src1 and src2, store result in dst
+  0x24  | 25   | stb      |  src1     |  src2     |  src3     |  8 bits    | store  8-bit value from src3 to address at src1+src2
+  0x25  | 25   | sth      |  src1     |  src2     |  src3     | 16 bits    | store 16-bit value from src3 to address at src1+src2
+  0x26  | 25   | stw      |  src1     |  src2     |  src3     | 32 bits    | store 32-bit value from src3 to address at src1+src2
+  0x26  | 0134 | bitrevs  |  0xc0     |  src2     |  dst      | 32 bits    | 
+  0x27  | 25   | std      |  src1     |  src2     |  src3     | 64 bits    | store 64-bit value from src3 to address at src1+src2
+  0x27  | 0134 | bitrevd  |  0xc0     |  src2     |  dst      | 64 bits    | 
+  0x64  | 0235 | ldb      |  src1     |  src2     |  dst      |  8 bits    | load  8-bit value from address at src1+src2, store into dst
+  0x65  | 0235 | ldh      |  src1     |  src2     |  dst      | 16 bits    | load 16-bit value from address at src1+src2, store into dst
+  0x66  | 0235 | ldw      |  src1     |  src2     |  dst      | 32 bits    | load 32-bit value from address at src1+src2, store into dst
+  0x67  | 0235 | ldd      |  src1     |  src2     |  dst      | 64 bits    | load 64-bit value from address at src1+src2, store into dst
+
+
+### EXT (opcode2 = 1)
+
+ Opcode | ALUs | name     | ALS[23:16]| ALS[15:8] | ALS[7:0]  | ALES[7:0]  | data width | description
+--------|------|----------|-----------|-----------|-----------|------------|------------|-------------
+  0x58  | 0    | getsp    |  0xec     |  src2     |  dst      | unused     | 32 -> 64   | Take src2, sign-extend to 32 bits; Add to user stack pointer, store in dst
