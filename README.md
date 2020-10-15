@@ -290,7 +290,7 @@ Bit     | Description
   src1            | `als[23:16]`                                     | source operand 1
   src2            | `als[15:8]`                                      | source operand 2 - can encode access to literal syllables (LTS)
   src3            | `als[7:0]` or `ales[7:0]`                        | source operand 3 - for ALOPF3 and ALOPF13 it is in ALS, for ALOPF21 it is in ALES
-  dst             | `als[7:0]` or `als[4:0]` for predicate registers | destination register
+  dst             | `als[7:0]`, or `als[4:0]` for predicate registers| destination register
 
 ##### src1 encoding
 
