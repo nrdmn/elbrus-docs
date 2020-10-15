@@ -16,6 +16,11 @@ mostly in Russian.
 
 - [Руководство по эффективному программированию на платформе «Эльбрус» (elbrus-prog)](http://ftp.altlinux.org/pub/people/mike/elbrus/docs/elbrus_prog/html/)
 - [Микропроцессоры и вычислительные комплексы семейства «Эльбрус»](http://www.mcst.ru/doc/book_121130.pdf)
+- A series of articles about porting [Embox](https://www.embox.rocks/) to Elbrus:
+  [introduction](https://habr.com/ru/company/embox/blog/421441/),
+  [part 1](https://habr.com/ru/company/embox/blog/447704/),
+  [part 2](https://habr.com/ru/company/embox/blog/447744/),
+  [part 3](https://habr.com/ru/company/embox/blog/485694/)
 
 
 ## Memory organization
