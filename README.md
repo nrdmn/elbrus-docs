@@ -304,7 +304,7 @@ Pattern   | Range | Description
 0xxx xxxx | 00-7f | Rotatable area procedure stack register
 10xx xxxx | 80-bf | procedure stack register
 110x xxxx | c0-df | constant between 0 and 31
-1110 xxxx | e0-ff | global register
+111x xxxx | e0-ff | global register
 
 ##### src2 encoding
 
@@ -344,7 +344,7 @@ Pattern   | Range | Description
 1101 0011 | d3    | %ctpr3
 1101 1110 | de    | %empty.lo
 1101 1111 | df    | %empty.hi
-1110 xxxx | e0-ff | global register
+111x xxxx | e0-ff | global register
 
 ##### Arithmetic-logical operation formats (ALOPF)
 
