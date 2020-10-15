@@ -365,6 +365,8 @@ TODO: ALOPF5, ALOPF6, ALOPF9, ALOPF10, ALOPF19
 
 It is not clear what the difference between ALOPF1 and ALOPF11 is.
 
+TODO: seems like ALS and ALES can have different opcode extension numbers
+
 #### ALES - Arithmetic-logical extension syllables
 
 Bit     | Description
