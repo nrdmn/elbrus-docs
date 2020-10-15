@@ -21,6 +21,8 @@ mostly in Russian.
   [part 1](https://habr.com/ru/company/embox/blog/447704/),
   [part 2](https://habr.com/ru/company/embox/blog/447744/),
   [part 3](https://habr.com/ru/company/embox/blog/485694/)
+- Pictures of [various](https://www.zvezdasp.ru/products/vychislitelnyy-kompleks-elbrus) [Elbrus](https://www.zvezdasp.ru/products/kompyutery-serii-elbrus)
+  [mainboards](https://www.zvezdasp.ru/products/moduli-protsessornye)
 
 
 ## Memory organization
