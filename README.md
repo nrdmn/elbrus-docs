@@ -275,32 +275,40 @@ control transfer operation is executed.
 
 #### ALS - Arithmetic-logical syllables
 
-All arithmetic-logical operations that are encoded in ALS are identified by an opcode at `als[30:24]`
-and possibly an opcode extension number and/or cmp opcode extension number and/or opcode 2.
-The role of the other bits in the ALS depends on the operation's format (ALOPF).
+The format of an arithmetic-logical operation (ALOPF) is determined by an opcode
+at `als[30:24]`, channel, and presence of an ALES. An opcode2 is required if an ALES
+is present and opcode extension, cmp opcode extension, and/or ALES opcode extension
+may be present and required to identify an arithmetic-logical operation, depending on
+the ALOPF. The presence and location of these additional criteria as well as operands
+depend on the ALOPF.
 
 Other variations:
 - Some operations require two ALS
 - Some operations require a Memory Address Specifier (MAS) in CS1
 - Some operations have predicates. Some operations require additional data from CDS.
-- ALOPF1, ALOPF2, ALOPF3, ALOPF7, ALOPF8 require no ALES (getsp is an exception), all others seem to require an ALES.
+- ALOPF1, ALOPF2, ALOPF3, ALOPF7, ALOPF8 require no ALES, all others seem to require an ALES.
 
 Bit     | Description
 ------- | -------------------------------------------------------------
    31   | Speculative mode
  30:24  | Opcode
- 23:16  | Operand src1, or opcode extension number
+ 23:16  | Operand src1, or opcode extension
  15:8   | Operand src2
-  7:0   | Operand src3 or dst
+  7:0   | Operand src3, dst, or cmp opcode extension
 
-##### Operand roles
+##### Operands and other fields
 
- Operand role     | encoded in                                       | description
-------------------|--------------------------------------------------|------------------------------------------------------
-  src1            | `als[23:16]`                                     | source operand 1
-  src2            | `als[15:8]`                                      | source operand 2 - can encode access to literal syllables (LTS)
-  src3            | `als[7:0]` or `ales[7:0]`                        | source operand 3 - for ALOPF3 and ALOPF13 it is in ALS, for ALOPF21 it is in ALES
-  dst             | `als[7:0]`, or `als[4:0]` for predicate registers| destination register
+ Field                | encoded in                                        | comment
+----------------------|---------------------------------------------------|------------------------------------------------------
+ opcode               | `ales[30:24]`                                     |
+ opcode2              | `ales[15:8]`                                      |
+ opcode extension     | `als[23:16]`                                      |
+ opcode extension 2   | `ales[7:0]`                                       |
+ cmp opcode extension | `als[7:5]` or `ales[7:0]`                         |
+ src1                 | `als[23:16]`                                      | source operand 1
+ src2                 | `als[15:8]`                                       | source operand 2 - can encode access to literal syllables (LTS)
+ src3                 | `als[7:0]` or `ales[7:0]`                         | source operand 3 - for ALOPF3 and ALOPF13 it is in ALS, for ALOPF21 it is in ALES
+ dst                  | `als[7:0]`, or `als[4:0]` for predicate registers | destination register
 
 ##### src1 encoding
 
@@ -353,36 +361,37 @@ Pattern   | Range | Description
 
 ##### Arithmetic-logical operation formats (ALOPF)
 
-Several operand formats are defined:
+Several operand formats are defined.
 
- Format  | src1 | src2 | src3 | dst | Example            | Comment
----------|------|------|------|-----|--------------------|----------
- ALOPF1  | x    | x    |      | x   | adds, ld{b,h,w,d}  |
- ALOPF2  |      | x    |      | x   | movx, popcnts      | Opcode `getsp` needs ALES even though it is ALOPF2; opcode extension number in `als[23:16]`
- ALOPF3  | x    | x    | x    |     | st{b,h,w,d}        | `src3` in ALS
- ALOPF7  | x    | x    |      | x   | cmposb             | `dst` is a predicate register; `als[7:5]` holds the cmp opcode extension number
- ALOPF8  |      | x    |      | x   | cctopo             | `dst` is a predicate register; `als[7:5]` holds the cmp opcode extension number
- ALOPF11 | x    | x    |      | x   | muls               | Some opcodes require a literal in `ales[7:0]`, all others have an opcode extension number there.
- ALOPF12 |      | x    |      | x   | fsqrts             | The opcode extension number is in `als[23:16]` and `ales[7:0]`. Opcode `pshufh` is special as it requires a literal in `ales[7:0]` instead.
- ALOPF13 | x    | x    | x    |     | stq                | `src3` in ALS
- ALOPF15 |      | x    |      | x   | rws, rwd           | `dst` is a status register; opcode 2 is EXT (1), extension is `0xc0`
- ALOPF16 | x    |      |      | x   | rrs, rrd           | `src2` is a status register; opcode 2 is EXT (1), extension is `0xc0`
- ALOPF17 | x    | x    |      | x   | pcmpeqbop          | `dst` is a predicate register; opcode 2 is EXT1 (2)
- ALOPF21 | x    | x    | x    | x   | incs\_fb           | `src3` in ALES
- ALOPF22 |      | x    |      | x   | movtq              | The opcode extension number is in `als[23:16]`; opcode 2 is EXT (1), the extension field in ALES is set to `0xc0`
+ Format            | Has ALES? | src1 | src2 | src3        | dst | opcode ext   | opcode ext 2 | cmp opcode ext | Example            | Comment
+-------------------|-----------|------|------|-------------|-----|--------------|--------------|----------------|--------------------|---------------
+ 1                 |           | x    | x    |             | x   |              |              |                | adds, ld{b,h,w,d}  |
+ 2                 |           |      | x    |             | x   | x            |              |                | movx, popcnts      |
+ 3                 |           | x    | x    | `als[7:0]`  |     |              |              |                | st{b,h,w,d}        |
+ 7                 |           | x    | x    |             | x   |              |              | `als[7:5]`     | cmposb             | dst is a predicate register
+ 8                 |           |      | x    |             | x   |              |              | `als[7:5]`     | cctopo             | dst is a predicate register
+ 11                | x         | x    | x    |             | x   |              | x            |                | muls               |
+ 11 (with literal) | x         | x    | x    |             | x   |              |              |                | psllqh             | These opcodes require a literal in `ales[7:0]`
+ 12                | x         |      | x    |             | x   | x            | x            |                | fsqrts             | Opcode `pshufh` is special as it requires a literal in `ales[7:0]`.
+ 13                | x         | x    | x    | `als[7:0]`  |     |              | x            |                | stq                |
+ 15                | x         |      | x    |             | x   |              | x            |                | rws, rwd           | dst is a status register; opcode2 is EXT; opcode extension 2 is 0xc0
+ 16                | x         | x    |      |             | x   |              | x            |                | rrs, rrd           | src2 is a status register; opcode2 is EXT; opcode extension 2 is 0xc0
+ 17                | x         | x    | x    |             | x   |              |              | `ales[7:0]`    | pcmpeqbop          | dst is a predicate register; opcode2 is EXT1
+ 21                | x         | x    | x    | `ales[7:0]` | x   |              |              |                | incs\_fb           |
+ 22                | x         |      | x    |             | x   | x            | x            |                | movtq              | opcode2 is EXT; ALES opcode extension is 0xc0
 
-TODO: ALOPF5, ALOPF6, ALOPF9, ALOPF10, ALOPF19
+For the locations of operands where none is explicitly specified here, see table 'Operands and other fields'.
 
-It is not clear what the difference between ALOPF1 and ALOPF11 is.
+TODO: ALOPF5, ALOPF6, ALOPF7, ALOPF9, ALOPF10, ALOPF19
 
-TODO: seems like ALS and ALES can have different opcode extension numbers
+NOTE: ALOPF9 and ALOPF10 have a 16 bit opcode extension
 
 #### ALES - Arithmetic-logical extension syllables
 
 Bit     | Description
 ------- | -------------------------------------------------------------
-  15:8  | Opcode 2
-   7:0  | src3 (in ALEF1) or extension or cmp opcode extension number (in ALEF2)
+  15:8  | Opcode2
+   7:0  | src3 (in ALEF1) or opcode extension 2 or cmp opcode extension (in ALEF2)
 
  Opcode 2 | Name
 ----------|-------------
