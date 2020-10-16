@@ -415,10 +415,10 @@ CS0 and CS1 encode different operations.
  Syllable | pattern   | name   | description
 ----------|-----------|--------|----------------------------------------
  CS0, CS1 |`0xxxxxxx` | set\*  | setwd/setbn/setbp/settr
-      CS1 |`1xxxxxxx` | vrfpsz | vrfpsz + setwd/setbn/setbp/settr
+ CS1      |`1xxxxxxx` | vrfpsz | vrfpsz + setwd/setbn/setbp/settr
  CS0      |`2xxxxxxx` | puttsd | puttsd with a multiple-of-8 parameter relative to the start of the current instruction
-      CS1 |`200000xx` | setei  |
-      CS1 |`28000000` | setsft |
+ CS1      |`200000xx` | setei  |
+ CS1      |`28000000` | setsft |
  CS0, CS1 |`300000xx` | wait   | wait for specified kinds of operations to complete
  CS0      |`4xxxxxxx` | disp   | prepare a relative jump in `ctpr1`
  CS0      |`5xxxxxxx` | ldisp  | prepare an array prefetch program (?) in `ctpr1`
@@ -426,7 +426,7 @@ CS0 and CS1 encode different operations.
  CS0      |`70000000` | return | prepare to return from procedure in `ctpr1`
  CS0      |`8xxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr2
  CS0      |`cxxxxxxx+`| --     | disp/ldisp/sdisp/return with ctpr3
-      CS1 |`6xxxx000` | setmas | Set memory address specifier for load and store operations
+ CS1      |`6xxxx000` | setmas | Set memory address specifier for load and store operations
 
 
 
