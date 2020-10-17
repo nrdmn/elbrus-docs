@@ -125,21 +125,21 @@ shift_read_window:
 
 .loop:
 ; check if drive's number of sectors is not greater
-; than partition's first sector
+; than read window's sector
 	cmp bx,[drive_sectors]
 	jbe .done
 
 ; if it is greater, subtract drive's number of sectors per track
-; from partition's first sector
+; from read window's sector
 	sub bx,[drive_sectors]
-; and increment partition's first head
+; and increment read window's head
 	inc dh
 
-; check if disk's number of heads if below partition's first head
+; check if disk's number of heads if below read window's head
 	cmp dh,[boot_info.heads]
 	jb .loop
 
-; set partition's first head to zero and increment cylinder
+; set read window's head to zero and increment cylinder
 ; then jump back
 	xor dh,dh
 	inc ch
