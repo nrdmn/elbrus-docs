@@ -328,10 +328,14 @@ Pattern   | Range        | Description
 0xxx xxxx | 00-7f        | Rotatable area procedure stack register
 10xx xxxx | 80-bf        | procedure stack register
 1100 xxxx | c0-cf        | constant between 0 and 15
-1101 0x0x | d0-d1, d4-d5 | reference to 16 bit literal semi-syllable; (1<<2) indicates high half of a LTS; Only in lts0 and lts1.
+1101 000x | d0-d1        | reference to 16 bit literal semi-syllable, low half of LTS0 or LTS1
+1101 010x | d4-d5        | reference to 16 bit literal semi-syllable, high half of LTS0 and LTS1
 1101 10xx | d8-db        | reference to 32 bit literal syllable LTS0, LTS1, LTS2, or LTS3
-1101 11xx | dc-df        | reference to 64 bit literal syllable pair (LTS0 and LTS1, LTS1 and LTS2, LTS2 and LTS3)
+1101 11xx | dc-de        | reference to 64 bit literal syllable pair LTS1:LTS0, LTS2:LTS1, or LTS3:LTS2
 111x xxxx | e0-ff        | global register
+
+Literal half-syllables are sign-extended on access. Thus, values 0-0x7fff and
+0xffff8000-0xffffffff (-0x8000 to -1) can be encoded in a literal half-syllable.
 
 ##### src3 encoding
 
@@ -560,4 +564,4 @@ The following tables are grouped by opcode2 and sorted by opcode.
 
  Opcode | ALUs | name     | ALS[23:16]| ALS[15:8] | ALS[7:0]  | ALES[7:0]  | data width | description
 --------|------|----------|-----------|-----------|-----------|------------|------------|-------------
-  0x58  | 0    | getsp    |  0xec     |  src2     |  dst      | unused     | 32 -> 64   | Take src2, sign-extend to 32 bits; Add to user stack pointer, store in dst
+  0x58  | 0    | getsp    |  0xec     |  src2     |  dst      | unused     | 32 -> 64   | Add src2 to user stack pointer, store in user stack pointer and dst
