@@ -540,10 +540,11 @@ TODO: ALOPF5, ALOPF6, ALOPF7, ALOPF9, ALOPF10, ALOPF19
 
 NOTE: ALOPF9 and ALOPF10 have a 16 bit opcode extension
 
+### List of operations
 
-### List of short operations (without ALES)
+The following tables are grouped by opcode2 and sorted by opcode.
 
-This table is grouped by opcode2 and sorted by opcode.
+#### Short operations (without ALES)
 
  Opcode | ALUs | name     | ALS[23:16]| ALS[15:8] | ALS[7:0]  | data width | description
 --------|------|----------|-----------|-----------|-----------|------------|--------------------------
@@ -563,9 +564,7 @@ This table is grouped by opcode2 and sorted by opcode.
   0x67  | 0235 | ldd      |  src1     |  src2     |  dst      | 64 bits    | load 64-bit value from address at src1+src2, store into dst
 
 
-### EXT (opcode2 = 1)
-
-This table is grouped by opcode2 and sorted by opcode.
+#### EXT (opcode2 = 1)
 
  Opcode | ALUs | name     | ALS[23:16]| ALS[15:8] | ALS[7:0]  | ALES[7:0]  | data width | description
 --------|------|----------|-----------|-----------|-----------|------------|------------|-------------
