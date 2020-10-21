@@ -275,19 +275,6 @@ control transfer operation is executed.
 
 #### ALS - Arithmetic-logical syllables
 
-The format of an arithmetic-logical operation (ALOPF) is determined by an opcode
-at `als[30:24]`, channel, and presence of an ALES. An opcode2 is required if an ALES
-is present and opcode extension, cmp opcode extension, and/or ALES opcode extension
-may be present and required to identify an arithmetic-logical operation, depending on
-the ALOPF. The presence and location of these additional criteria as well as operands
-depend on the ALOPF.
-
-Other variations:
-- Some operations require two ALS
-- Some operations require a Memory Address Specifier (MAS) in CS1
-- Some operations have predicates. Some operations require additional data from CDS.
-- ALOPF1, ALOPF2, ALOPF3, ALOPF7, ALOPF8 require no ALES, all others seem to require an ALES.
-
 Bit     | Description
 ------- | -------------------------------------------------------------
    31   | Speculative mode
@@ -296,99 +283,7 @@ Bit     | Description
  15:8   | Operand src2
   7:0   | Operand src3, dst, or cmp opcode extension
 
-##### Operands and other fields
-
- Field                | encoded in                                        | comment
-----------------------|---------------------------------------------------|------------------------------------------------------
- opcode               | `ales[30:24]`                                     |
- opcode2              | `ales[15:8]`                                      |
- opcode extension     | `als[23:16]`                                      |
- opcode extension 2   | `ales[7:0]`                                       |
- cmp opcode extension | `als[7:5]` or `ales[7:0]`                         |
- src1                 | `als[23:16]`                                      | source operand 1
- src2                 | `als[15:8]`                                       | source operand 2 - can encode access to literal syllables (LTS)
- src3                 | `als[7:0]` or `ales[7:0]`                         | source operand 3 - for ALOPF3 and ALOPF13 it is in ALS, for ALOPF21 it is in ALES
- dst                  | `als[7:0]`, or `als[4:0]` for predicate registers | destination register
-
-##### src1 encoding
-
-Pattern   | Range | Description
-----------|-------|------------------------------------
-0xxx xxxx | 00-7f | Rotatable area procedure stack register
-10xx xxxx | 80-bf | procedure stack register
-110x xxxx | c0-df | constant between 0 and 31
-111x xxxx | e0-ff | global register
-
-##### src2 encoding
-
-src2 that are not status register numbers are encoded as follows:
-
-Pattern   | Range        | Description
-----------|--------------|------------------------------------
-0xxx xxxx | 00-7f        | Rotatable area procedure stack register
-10xx xxxx | 80-bf        | procedure stack register
-1100 xxxx | c0-cf        | constant between 0 and 15
-1101 000x | d0-d1        | reference to 16 bit literal semi-syllable, low half of LTS0 or LTS1
-1101 010x | d4-d5        | reference to 16 bit literal semi-syllable, high half of LTS0 and LTS1
-1101 10xx | d8-db        | reference to 32 bit literal syllable LTS0, LTS1, LTS2, or LTS3
-1101 11xx | dc-de        | reference to 64 bit literal syllable pair LTS1:LTS0, LTS2:LTS1, or LTS3:LTS2
-111x xxxx | e0-ff        | global register
-
-Literal half-syllables are sign-extended on access. Thus, values 0-0x7fff and
-0xffff8000-0xffffffff (-0x8000 to -1) can be encoded in a literal half-syllable.
-
-##### src3 encoding
-
-Pattern   | Range | Description
-----------|-------|------------------------------------
-0xxx xxxx | 00-7f | Rotatable area procedure stack register
-10xx xxxx | 80-bf | procedure stack register
-111x xxxx | e0-ff | global register
-
-##### dst encoding
-
-dst that are not predicate register numbers or status register numbers are encoded as follows:
-
-Pattern   | Range | Description
-----------|-------|------------------------------------
-0xxx xxxx | 00-7f | Rotatable area procedure stack register
-10xx xxxx | 80-bf | procedure stack register
-1100 1101 | cd    | %tst
-1100 1110 | ce    | %tc
-1100 1111 | cf    | %tcd
-1101 0001 | d1    | %ctpr1
-1101 0010 | d2    | %ctpr2
-1101 0011 | d3    | %ctpr3
-1101 1110 | de    | %empty.lo
-1101 1111 | df    | %empty.hi
-111x xxxx | e0-ff | global register
-
-##### Arithmetic-logical operation formats (ALOPF)
-
-Several operand formats are defined.
-
- Format            | Has ALES? | src1 | src2 | src3        | dst | opcode ext   | opcode ext 2 | cmp opcode ext | Example            | Comment
--------------------|-----------|------|------|-------------|-----|--------------|--------------|----------------|--------------------|---------------
- 1                 |           | x    | x    |             | x   |              |              |                | adds, ld{b,h,w,d}  |
- 2                 |           |      | x    |             | x   | x            |              |                | movx, popcnts      |
- 3                 |           | x    | x    | `als[7:0]`  |     |              |              |                | st{b,h,w,d}        |
- 7                 |           | x    | x    |             | x   |              |              | `als[7:5]`     | cmposb             | dst is a predicate register
- 8                 |           |      | x    |             | x   |              |              | `als[7:5]`     | cctopo             | dst is a predicate register
- 11                | x         | x    | x    |             | x   |              | x            |                | muls               |
- 11 (with literal) | x         | x    | x    |             | x   |              |              |                | psllqh             | These opcodes require a literal in `ales[7:0]`
- 12                | x         |      | x    |             | x   | x            | x            |                | fsqrts             | Opcode `pshufh` is special as it requires a literal in `ales[7:0]`.
- 13                | x         | x    | x    | `als[7:0]`  |     |              | x            |                | stq                |
- 15                | x         |      | x    |             | x   |              | x            |                | rws, rwd           | dst is a status register; opcode2 is EXT; opcode extension 2 is 0xc0
- 16                | x         | x    |      |             | x   |              | x            |                | rrs, rrd           | src2 is a status register; opcode2 is EXT; opcode extension 2 is 0xc0
- 17                | x         | x    | x    |             | x   |              |              | `ales[7:0]`    | pcmpeqbop          | dst is a predicate register; opcode2 is EXT1
- 21                | x         | x    | x    | `ales[7:0]` | x   |              |              |                | incs\_fb           |
- 22                | x         |      | x    |             | x   | x            | x            |                | movtq              | opcode2 is EXT; ALES opcode extension is 0xc0
-
-For the locations of operands where none is explicitly specified here, see table 'Operands and other fields'.
-
-TODO: ALOPF5, ALOPF6, ALOPF7, ALOPF9, ALOPF10, ALOPF19
-
-NOTE: ALOPF9 and ALOPF10 have a 16 bit opcode extension
+See chapter 'Arithmetic-logical operations' for more information on the operands.
 
 #### ALES - Arithmetic-logical extension syllables
 
@@ -396,30 +291,6 @@ Bit     | Description
 ------- | -------------------------------------------------------------
   15:8  | Opcode2
    7:0  | src3 (in ALEF1) or opcode extension 2 or cmp opcode extension (in ALEF2)
-
- Opcode 2 | Name
-----------|-------------
- 0x01     | EXT
- 0x02     | EXT1
- 0x03     | EXT2
- 0x04     | FLB
- 0x05     | FLH
- 0x06     | FLW
- 0x07     | FLD
- 0x08     | ICMB0
- 0x09     | ICMB1
- 0x0a     | ICMB2
- 0x0b     | ICMB3
- 0x0c     | FCMB0
- 0x0d     | FCMB1
- 0x0e     | PFCMB0
- 0x0f     | PFCMB1
- 0x10     | LCMBD0
- 0x11     | LCMBD1
- 0x12     | LCMBQ0
- 0x13     | LCMBQ1
- 0x16     | QPFCMB0
- 0x17     | QPFCMB1
 
 #### CS - Control syllables
 
@@ -528,19 +399,151 @@ The maximum length of an array prefetch program is 32 instructions.
 
 
 
-## List of ALU operations
+## Arithmetic-logical operations
 
 ALU operations are generally identified by several aspects:
 
 - The opcode field in the ALS
 - If a corrsponding ALES exists, the opcode2 field in the ALES
+- Opcode extension, opcode extension 2, and cmp opcode extension, depending on the opcode
 - The ALUs in which the operation can be performed. Sometimes the same opcode
   can mean different operations in different ALUs (numbered from 0 to 5)
 
-The following tables are grouped by opcode2 and sorted by opcode.
+The format of an arithmetic-logical operation (ALOPF) is determined by opcode,
+channel, and presence of an ALES. The presence and location of additional
+identifying criteria of an operation as well as operands depend on the ALOPF.
+
+Other variations:
+- Some operations require two ALS
+- Some operations require a Memory Address Specifier (MAS) in CS1
+- Some operations have predicates. Some operations require additional data from CDS.
+- ALOPF1, ALOPF2, ALOPF3, ALOPF7, ALOPF8 require no ALES, all others seem to require an ALES.
+
+### Operands and other fields
+
+ Field                | encoded in                                        | comment
+----------------------|---------------------------------------------------|------------------------------------------------------
+ opcode               | `ales[30:24]`                                     |
+ opcode2              | `ales[15:8]`                                      |
+ opcode extension     | `als[23:16]`                                      |
+ opcode extension 2   | `ales[7:0]`                                       |
+ cmp opcode extension | `als[7:5]` or `ales[7:0]`                         |
+ src1                 | `als[23:16]`                                      | source operand 1
+ src2                 | `als[15:8]`                                       | source operand 2 - can encode access to literal syllables (LTS)
+ src3                 | `als[7:0]` or `ales[7:0]`                         | source operand 3 - for ALOPF3 and ALOPF13 it is in ALS, for ALOPF21 it is in ALES
+ dst                  | `als[7:0]`, or `als[4:0]` for predicate registers | destination register
+
+#### src1 encoding
+
+Pattern   | Range | Description
+----------|-------|------------------------------------
+0xxx xxxx | 00-7f | Rotatable area procedure stack register
+10xx xxxx | 80-bf | procedure stack register
+110x xxxx | c0-df | constant between 0 and 31
+111x xxxx | e0-ff | global register
+
+#### src2 encoding
+
+src2 that are not status register numbers are encoded as follows:
+
+Pattern   | Range        | Description
+----------|--------------|------------------------------------
+0xxx xxxx | 00-7f        | Rotatable area procedure stack register
+10xx xxxx | 80-bf        | procedure stack register
+1100 xxxx | c0-cf        | constant between 0 and 15
+1101 000x | d0-d1        | reference to 16 bit literal semi-syllable, low half of LTS0 or LTS1
+1101 010x | d4-d5        | reference to 16 bit literal semi-syllable, high half of LTS0 and LTS1
+1101 10xx | d8-db        | reference to 32 bit literal syllable LTS0, LTS1, LTS2, or LTS3
+1101 11xx | dc-de        | reference to 64 bit literal syllable pair LTS1:LTS0, LTS2:LTS1, or LTS3:LTS2
+111x xxxx | e0-ff        | global register
+
+Literal half-syllables are sign-extended on access. Thus, values 0-0x7fff and
+0xffff8000-0xffffffff (-0x8000 to -1) can be encoded in a literal half-syllable.
+
+#### src3 encoding
+
+Pattern   | Range | Description
+----------|-------|------------------------------------
+0xxx xxxx | 00-7f | Rotatable area procedure stack register
+10xx xxxx | 80-bf | procedure stack register
+111x xxxx | e0-ff | global register
+
+#### dst encoding
+
+dst that are not predicate register numbers or status register numbers are encoded as follows:
+
+Pattern   | Range | Description
+----------|-------|------------------------------------
+0xxx xxxx | 00-7f | Rotatable area procedure stack register
+10xx xxxx | 80-bf | procedure stack register
+1100 1101 | cd    | %tst
+1100 1110 | ce    | %tc
+1100 1111 | cf    | %tcd
+1101 0001 | d1    | %ctpr1
+1101 0010 | d2    | %ctpr2
+1101 0011 | d3    | %ctpr3
+1101 1110 | de    | %empty.lo
+1101 1111 | df    | %empty.hi
+111x xxxx | e0-ff | global register
+
+#### opcode2 values
+
+ Opcode2 | Name
+----------|-------------
+ 0x01     | EXT
+ 0x02     | EXT1
+ 0x03     | EXT2
+ 0x04     | FLB
+ 0x05     | FLH
+ 0x06     | FLW
+ 0x07     | FLD
+ 0x08     | ICMB0
+ 0x09     | ICMB1
+ 0x0a     | ICMB2
+ 0x0b     | ICMB3
+ 0x0c     | FCMB0
+ 0x0d     | FCMB1
+ 0x0e     | PFCMB0
+ 0x0f     | PFCMB1
+ 0x10     | LCMBD0
+ 0x11     | LCMBD1
+ 0x12     | LCMBQ0
+ 0x13     | LCMBQ1
+ 0x16     | QPFCMB0
+ 0x17     | QPFCMB1
 
 
-### Short operations (without ALES)
+### Arithmetic-logical operation formats (ALOPF)
+
+Several operand formats are defined.
+
+ Format            | Has ALES? | src1 | src2 | src3        | dst | opcode ext   | opcode ext 2 | cmp opcode ext | Example            | Comment
+-------------------|-----------|------|------|-------------|-----|--------------|--------------|----------------|--------------------|---------------
+ 1                 |           | x    | x    |             | x   |              |              |                | adds, ld{b,h,w,d}  |
+ 2                 |           |      | x    |             | x   | x            |              |                | movx, popcnts      |
+ 3                 |           | x    | x    | `als[7:0]`  |     |              |              |                | st{b,h,w,d}        |
+ 7                 |           | x    | x    |             | x   |              |              | `als[7:5]`     | cmposb             | dst is a predicate register
+ 8                 |           |      | x    |             | x   |              |              | `als[7:5]`     | cctopo             | dst is a predicate register
+ 11                | x         | x    | x    |             | x   |              | x            |                | muls               |
+ 11 (with literal) | x         | x    | x    |             | x   |              |              |                | psllqh             | These opcodes require a literal in `ales[7:0]`
+ 12                | x         |      | x    |             | x   | x            | x            |                | fsqrts             | Opcode `pshufh` is special as it requires a literal in `ales[7:0]`.
+ 13                | x         | x    | x    | `als[7:0]`  |     |              | x            |                | stq                |
+ 15                | x         |      | x    |             | x   |              | x            |                | rws, rwd           | dst is a status register; opcode2 is EXT; opcode extension 2 is 0xc0
+ 16                | x         | x    |      |             | x   |              | x            |                | rrs, rrd           | src2 is a status register; opcode2 is EXT; opcode extension 2 is 0xc0
+ 17                | x         | x    | x    |             | x   |              |              | `ales[7:0]`    | pcmpeqbop          | dst is a predicate register; opcode2 is EXT1
+ 21                | x         | x    | x    | `ales[7:0]` | x   |              |              |                | incs\_fb           |
+ 22                | x         |      | x    |             | x   | x            | x            |                | movtq              | opcode2 is EXT; ALES opcode extension is 0xc0
+
+For the locations of operands where none is explicitly specified here, see table 'Operands and other fields'.
+
+TODO: ALOPF5, ALOPF6, ALOPF7, ALOPF9, ALOPF10, ALOPF19
+
+NOTE: ALOPF9 and ALOPF10 have a 16 bit opcode extension
+
+
+### List of short operations (without ALES)
+
+This table is grouped by opcode2 and sorted by opcode.
 
  Opcode | ALUs | name     | ALS[23:16]| ALS[15:8] | ALS[7:0]  | data width | description
 --------|------|----------|-----------|-----------|-----------|------------|--------------------------
@@ -561,6 +564,8 @@ The following tables are grouped by opcode2 and sorted by opcode.
 
 
 ### EXT (opcode2 = 1)
+
+This table is grouped by opcode2 and sorted by opcode.
 
  Opcode | ALUs | name     | ALS[23:16]| ALS[15:8] | ALS[7:0]  | ALES[7:0]  | data width | description
 --------|------|----------|-----------|-----------|-----------|------------|------------|-------------
