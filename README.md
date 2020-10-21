@@ -137,8 +137,9 @@ Syllables occur in the following order:
 - HS
 - SS
 - ALS0, ALS1, ALS2, ALS3, ALS4, ALS5
-- CS0, CS1
+- CS0
 - ALES2, ALES5
+- CS1
 - ALES0, ALES1, ALES3, ALES4
 - AAS0, AAS1, AAS2, AAS3, AAS4, AAS5
 - LTS3, LTS2, LTS1, LTS0
