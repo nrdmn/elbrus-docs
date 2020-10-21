@@ -150,13 +150,15 @@ Syllables occur in the following order:
 
 Semi-syllables ALES and AAS are a half-word (2 bytes) long. All other syllables are one word (4 bytes) long.
 
-Syllables SS, ALS\* and CS\* occur as indicated in the header syllable in the order described above.
+Syllables SS, ALS\* and CS0 occur as indicated in the header syllable in the order described above.
 They are packed, e.g. if header bits indicate presence of ALS0 and ALS2 but not SS nor ALS1, then the syllable ALS0 follows directly after HS and ALS2 follows directly after ALS0.
 
 If presence of ALES2 or ALES5 is indicated, then a whole word is allocated for them, whether both are present or not.
 The first of both to be present occupies the more significant half of the word, the second is encoded in the less significant half.
 For example, when looking at the syllables as bytes, if ALES2 and ALES5 are present, then the first two bytes of the little endian word contain ALES5 and the last two bytes contain ALES2.
 If only ALES5 is present, the first two bytes are empty and the last two bytes contain ALES5.
+
+CS1 may follow right after the previously described syllables.
 
 ALES{0,1,3,4} and AAS\* start at the word indicated by the "middle pointer" from the header syllable. Their ordering is the same as for ALES2 and ALES5 (high half first, low half second) but they are all packed. This means that any two syllables of ALES{0,1,3,4} and AAS{0,1} may share a word. ALES\* may not share a word with AAS{2,3,4,5} because presence of the latter implies presence of AAS0 and/or AAS1.
 For example, if ALES0, ALES1, ALES4, AAS0 and AAS2 are indicated, then they are encoded as ALES1, ALES0, AAS0, ALES4, two bytes left empty, and finally AAS2.
