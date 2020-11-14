@@ -236,13 +236,14 @@ Bit     | Name     | Description
    26   |          | encodes invts and flushts, see below
    25   | crp (?)  |
    20   | type     | type is 1 for SF2
+  4:0   | pred     | `pred` num
 
 `(ss >> 27 & 6) \| (ss >> 26 & 1)`   | Description
 -----------------------------------|------------
  2 | `invts`
  3 | `flushts`
- 6 | `invts ? %predN`, where N is `ss & 0x1f`
- 7 | `invts ? ~ %predN`, where N is `ss & 0x1f`
+ 6 | `invts ? %predN`
+ 7 | `invts ? ~ %predN`
 
 
 ##### `ct` condition codes
